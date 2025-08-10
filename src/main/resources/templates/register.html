@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - NeedItNow</title>
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        html, body {
+            height: 100%;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #000;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* Background effects - EXACT match with index */
+        .bg-gradient {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(168, 85, 247, 0.4), rgba(147, 51, 234, 0.5), #000);
+        }
+
+        .noise-overlay {
+            position: absolute;
+            inset: 0;
+            opacity: 0.03;
+            mix-blend-mode: soft-light;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            background-size: 200px 200px;
+        }
+
+        .glow-top {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120vh;
+            height: 60vh;
+            border-radius: 0 0 50% 50%;
+            background: rgba(192, 132, 252, 0.2);
+            filter: blur(80px);
+        }
+
+        .glow-middle {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100vh;
+            height: 60vh;
+            border-radius: 0 0 100% 100%;
+            background: rgba(216, 180, 254, 0.2);
+            filter: blur(60px);
+            animation: pulse-middle 8s ease-in-out infinite alternate;
+        }
+
+        .glow-bottom {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90vh;
+            height: 90vh;
+            border-radius: 100% 100% 0 0;
+            background: rgba(192, 132, 252, 0.2);
+            filter: blur(60px);
+            animation: pulse-bottom 6s ease-in-out 1s infinite alternate;
+        }
+
+        .glow-spot-1, .glow-spot-2 {
+            position: absolute;
+            width: 24rem;
+            height: 24rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.4;
+            animation: pulse-spot 3s ease-in-out infinite;
+        }
+
+        .glow-spot-1 {
+            left: 25%;
+            top: 25%;
+        }
+
+        .glow-spot-2 {
+            right: 25%;
+            bottom: 25%;
+            animation-delay: 1s;
+        }
+
+        /* Register container - matches login card exactly */
+        .register-container {
+            max-width: 28rem;
+            width: 100%;
+            z-index: 10;
+            perspective: 1500px;
+            animation: slide-up 0.8s ease forwards;
+        }
+
+        .card {
+            position: relative;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid transparent;
+            border-radius: 1rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s;
+            border-image: linear-gradient(
+                to right,
+                transparent 30%,
+                rgba(255, 255, 255, 0.7) 50%,
+                transparent 70%
+            ) 1;
+            border-image-slice: 1;
+            animation: edge-shine 4s linear infinite;
+        }
+
+        .card:hover {
+            transform: translateZ(10px);
+        }
+
+        .card-pattern {
+            position: absolute;
+            inset: 0;
+            opacity: 0.03;
+            background-image: linear-gradient(135deg, #fff 0.5px, transparent 0.5px), linear-gradient(45deg, #fff 0.5px, transparent 0.5px);
+            background-size: 30px 30px;
+        }
+
+        /* Logo - EXACT match */
+        .logo {
+            width: 3rem;
+            height: 3rem;
+            margin: 0 auto 1.25rem;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            animation: logo-appear 0.8s ease;
+        }
+
+        .logo svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .logo::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.1), transparent);
+            opacity: 0.5;
+        }
+
+        /* Header - EXACT match */
+        h1 {
+            font-size: 1.25rem;
+            font-weight: bold;
+            background: linear-gradient(to bottom, #fff, rgba(255, 255, 255, 0.8));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            animation: slide-up 0.8s ease 0.2s forwards;
+            opacity: 0;
+        }
+
+        /* Form styles - EXACT match with index */
+        .form-group {
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-col {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .password-input-container {
+            position: relative;
+        }
+
+        input, select {
+            width: 100%;
+            height: 2.5rem;
+            padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            border-radius: 0.5rem;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        /* Special case for inputs without icons */
+        input.no-icon, select {
+            padding-left: 0.75rem;
+        }
+
+        input:focus, select:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        select option {
+            background: rgba(0, 0, 0, 0.9);
+            color: #fff;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 12px;
+            width: 16px;
+            height: 16px;
+            color: rgba(255, 255, 255, 0.4);
+            transition: color 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .form-group.focused .input-icon {
+            color: #fff;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            user-select: none;
+            color: rgba(255, 255, 255, 0.4);
+            transition: color 0.3s;
+        }
+
+        .toggle-password:hover {
+            color: #fff;
+        }
+
+        .eye-icon {
+            font-style: normal;
+            display: inline-block;
+            transition: all 0.2s;
+        }
+
+        .eye-icon.closed {
+            opacity: 0.7;
+        }
+
+        #password {
+            padding-right: 2.5rem;
+        }
+
+        /* Button - EXACT match */
+        button {
+            width: 100%;
+            height: 2.5rem;
+            background: #fff;
+            color: #000;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: transform 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover {
+            transform: scale(1.02);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
+            transform: translateX(-100%);
+            animation: button-shine 1.5s ease-in-out infinite;
+        }
+
+        /* Messages - EXACT match */
+        .error-message, .success-message {
+            margin: 0.75rem 0;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            text-align: center;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            background: rgba(231, 76, 60, 0.1);
+        }
+
+        .success-message {
+            color: #2e7d32;
+            background: rgba(46, 125, 50, 0.1);
+        }
+
+        /* Login link - EXACT match */
+        .login-link {
+            margin-top: 1rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.75rem;
+            text-align: center;
+        }
+
+        .login-link a {
+            color: #fff;
+            text-decoration: none;
+            position: relative;
+            font-weight: 500;
+        }
+
+        .login-link a:hover::after {
+            width: 100%;
+        }
+
+        .login-link a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: #fff;
+            transition: width 0.3s;
+        }
+
+        /* Animations - EXACT match */
+        @keyframes slide-up {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes logo-appear {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes pulse-middle {
+            0%, 100% { opacity: 0.15; transform: translateX(-50%) scale(0.98); }
+            50% { opacity: 0.3; transform: translateX(-50%) scale(1.02); }
+        }
+
+        @keyframes pulse-bottom {
+            0%, 100% { opacity: 0.3; transform: translateX(-50%) scale(1); }
+            50% { opacity: 0.5; transform: translateX(-50%) scale(1.1); }
+        }
+
+        @keyframes pulse-spot {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.6; }
+        }
+
+        @keyframes edge-shine {
+            0% { border-image-source: linear-gradient(0deg, transparent 30%, rgba(255, 255, 255, 0.7) 50%, transparent 70%); }
+            25% { border-image-source: linear-gradient(90deg, transparent 30%, rgba(255, 255, 255, 0.7) 50%, transparent 70%); }
+            50% { border-image-source: linear-gradient(180deg, transparent 30%, rgba(255, 255, 255, 0.7) 50%, transparent 70%); }
+            75% { border-image-source: linear-gradient(270deg, transparent 30%, rgba(255, 255, 255, 0.7) 50%, transparent 70%); }
+            100% { border-image-source: linear-gradient(360deg, transparent 30%, rgba(255, 255, 255, 0.7) 50%, transparent 70%); }
+        }
+
+        @keyframes button-shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Responsive - EXACT match */
+        @media (max-width: 768px) {
+            .register-container {
+                max-width: 100%;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            input, select, button {
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background effects - EXACT match -->
+    <div class="bg-gradient"></div>
+    <div class="noise-overlay"></div>
+    <div class="glow-top"></div>
+    <div class="glow-middle"></div>
+    <div class="glow-bottom"></div>
+    <div class="glow-spot-1"></div>
+    <div class="glow-spot-2"></div>
+
+    <div class="register-container">
+        <div class="card" id="card">
+            <div class="card-pattern"></div>
+
+            <!-- Logo - EXACT match -->
+            <div class="logo">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="45" fill="url(#logo-gradient)" />
+                    <text x="50%" y="50%" text-anchor="middle" fill="white" font-family="Arial" font-size="30" font-weight="bold" dy=".3em">NIN</text>
+                    <defs>
+                        <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:rgba(168, 85, 247, 0.8);stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:rgba(147, 51, 234, 0.8);stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+
+            <!-- Header -->
+            <h1>Create Your Account</h1>
+
+            <!-- Success Message -->
+            <div th:if="${successMessage}" class="success-message">
+                <span th:text="${successMessage}"></span>
+            </div>
+
+            <!-- Error Message -->
+            <div th:if="${errorMessage}" class="error-message">
+                <span th:text="${errorMessage}"></span>
+            </div>
+            <div th:if="${error}" class="error-message" th:text="${error}"></div>
+
+            <!-- Form -->
+            <form th:action="@{/user/register}" method="post" th:object="${user}">
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <div class="input-group">
+                        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <div class="input-group">
+                        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        <input type="text" id="username" name="username" placeholder="Choose a username" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <div class="input-group">
+                        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                        <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="phoneNumber">Phone Number</label>
+                    <div class="input-group">
+                        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                        </svg>
+                        <input type="tel" id="phoneNumber" name="phoneNumber" placeholder="Enter phone number" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <div class="input-group">
+                        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                        <input type="text" id="address" name="address" placeholder="Enter your address" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="flatNumber">Flat/House No.</label>
+                            <input type="text" id="flatNumber" name="flatNumber" placeholder="Flat/House No." class="no-icon" required>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="city">City</label>
+                            <input type="text" id="city" name="city" placeholder="City" class="no-icon" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="pincode">Pincode</label>
+                            <input type="text" id="pincode" name="pincode" placeholder="Pincode" class="no-icon" required>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="state">State/UT</label>
+                            <select id="state" name="state" required>
+                                <option value="">Select State/UT</option>
+                                <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                                <option value="Assam">Assam</option>
+                                <option value="Bihar">Bihar</option>
+                                <option value="Chhattisgarh">Chhattisgarh</option>
+                                <option value="Goa">Goa</option>
+                                <option value="Gujarat">Gujarat</option>
+                                <option value="Haryana">Haryana</option>
+                                <option value="Himachal Pradesh">Himachal Pradesh</option>
+                                <option value="Jharkhand">Jharkhand</option>
+                                <option value="Karnataka">Karnataka</option>
+                                <option value="Kerala">Kerala</option>
+                                <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                <option value="Maharashtra">Maharashtra</option>
+                                <option value="Manipur">Manipur</option>
+                                <option value="Meghalaya">Meghalaya</option>
+                                <option value="Mizoram">Mizoram</option>
+                                <option value="Nagaland">Nagaland</option>
+                                <option value="Odisha">Odisha</option>
+                                <option value="Punjab">Punjab</option>
+                                <option value="Rajasthan">Rajasthan</option>
+                                <option value="Sikkim">Sikkim</option>
+                                <option value="Tamil Nadu">Tamil Nadu</option>
+                                <option value="Telangana">Telangana</option>
+                                <option value="Tripura">Tripura</option>
+                                <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                <option value="Uttarakhand">Uttarakhand</option>
+                                <option value="West Bengal">West Bengal</option>
+                                <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+                                <option value="Chandigarh">Chandigarh</option>
+                                <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
+                                <option value="Delhi">Delhi</option>
+                                <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                                <option value="Ladakh">Ladakh</option>
+                                <option value="Lakshadweep">Lakshadweep</option>
+                                <option value="Puducherry">Puducherry</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="password-input-container">
+                        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            <line x1="12" y1="15" x2="12" y2="17"></line>
+                        </svg>
+                        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                        <span class="toggle-password" onclick="togglePassword('password')">
+                            <i id="register-eye-icon" class="eye-icon">👁️</i>
+                        </span>
+                    </div>
+                </div>
+
+                <button type="submit">Create Account</button>
+            </form>
+
+            <div class="login-link">
+                Already have an account? <a th:href="@{/}">Login here</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById('register-eye-icon');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.textContent = '👁️';
+                icon.classList.remove('closed');
+            } else {
+                input.type = 'password';
+                icon.textContent = '👁️';
+                icon.classList.add('closed');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('register-eye-icon').classList.add('closed');
+
+            // 3D card effect - EXACT match with index
+            const card = document.getElementById('card');
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                const rotateY = (x / 300) * 10;
+                const rotateX = (y / 300) * -10;
+                card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(10px)`;
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'rotateX(0deg) rotateY(0deg)';
+            });
+
+            // Input focus effects - EXACT match with index
+            const inputs = document.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                input.addEventListener('focus', () => {
+                    const formGroup = input.closest('.form-group');
+                    if (formGroup) {
+                        formGroup.classList.add('focused');
+                    }
+                });
+                input.addEventListener('blur', () => {
+                    const formGroup = input.closest('.form-group');
+                    if (formGroup) {
+                        formGroup.classList.remove('focused');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

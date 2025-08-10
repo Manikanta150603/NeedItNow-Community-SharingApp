@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Details - NeedItNow</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        .request-details {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .request-image {
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 8px;
+            width: 100%;
+        }
+        .chat-container {
+            height: 400px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #dee2e6;
+        }
+        .chat-message {
+            margin-bottom: 0.75rem;
+        }
+        .message-content {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 18px;
+            max-width: 80%;
+        }
+        .message-sender {
+            text-align: right;
+        }
+        .message-sender .message-content {
+            background-color: #007bff;
+            color: white;
+        }
+        .message-receiver .message-content {
+            background-color: #e9ecef;
+            color: #212529;
+        }
+        .message-time {
+            font-size: 0.75rem;
+            color: #6c757d;
+            margin-top: 0.25rem;
+        }
+        .urgency-badge {
+            font-size: 0.8rem;
+            padding: 0.35rem 0.7rem;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+        <div class="container">
+            <a class="navbar-brand" href="#">NeedItNow</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/user/dashboard}"><i class="fas fa-home"></i> Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-bell"></i> Notifications</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-user"></i> Profile</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container mt-4">
+        <div class="row mb-4">
+            <div class="col">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/user/dashboard}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/user/community/{id}(id=${communityId})}">Community</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/user/community/{id}/share-circle(id=${communityId})}">ShareCircle</a></li>
+                        <li class="breadcrumb-item">
+                            <a th:if="${isRequester}" th:href="@{/user/community/{id}/neighbor/my-requests(id=${communityId})}">My Requests</a>
+                            <a th:unless="${isRequester}" th:href="@{/user/community/{id}/neighbor/help-requests(id=${communityId})}">Help Requests</a>
+                        </li>
+                        <li class="breadcrumb-item active" th:text="${request.title}">Request Details</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-7">
+                <!-- Request Details Card -->
+                <div class="request-details">
+                    <h2 class="mb-3" th:text="${request.title}">Request Title</h2>
+                    
+                    <div class="d-flex align-items-center mb-3">
+                        <span class="me-3">
+                            <i class="fas fa-tag me-1"></i> 
+                            <span th:text="${request.category}">Category</span>
+                        </span>
+                        
+                        <span class="me-3" th:if="${request.urgency}">
+                            <span th:if="${request.urgency == 'Normal'}" class="urgency-badge bg-success text-white">Normal</span>
+                            <span th:if="${request.urgency == 'Urgent'}" class="urgency-badge bg-warning text-dark">Urgent</span>
+                            <span th:if="${request.urgency == 'Very Urgent'}" class="urgency-badge bg-danger text-white">Very Urgent</span>
+                        </span>
+                        
+                        <span th:if="${request.isResolved}" class="badge bg-secondary">Resolved</span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <span>
+                            <i class="fas fa-user me-1"></i> 
+                            <span th:if="${request.displayName}" th:text="${request.requester.firstName + ' ' + request.requester.lastName}">User Name</span>
+                            <span th:unless="${request.displayName}">Anonymous</span>
+                        </span>
+                        <span class="ms-3">
+                            <i class="fas fa-calendar-alt me-1"></i> 
+                            <span th:text="${#temporals.format(request.createdAt, 'MMM dd, yyyy')}">Date</span>
+                        </span>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <p th:text="${request.description}">Description of the request goes here...</p>
+                    </div>
+                    
+                    <div th:if="${request.photoDataBase64 != null}" class="mb-4">
+                        <img th:src="@{'data:image/jpeg;base64,' + ${request.photoDataBase64}}" 
+                             class="request-image" alt="Request Image">
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <div>
+                            <!-- Requester actions -->
+                            <div th:if="${isRequester}">
+                                <form th:action="@{/user/community/{communityId}/neighbor/request/{requestId}/resolve(communityId=${communityId}, requestId=${request.id})}" 
+                                      method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-success" 
+                                            th:disabled="${request.isResolved}">
+                                        <i class="fas fa-check-circle me-1"></i> Mark as Resolved
+                                    </button>
+                                </form>
+                                
+                                <form th:action="@{/user/community/{communityId}/neighbor/request/{requestId}/delete(communityId=${communityId}, requestId=${request.id})}" 
+                                      method="post" class="d-inline ms-2">
+                                    <button type="submit" class="btn btn-danger" 
+                                            onclick="return confirm('Are you sure you want to delete this request?');">
+                                        <i class="fas fa-trash me-1"></i> Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <a th:if="${isRequester}" 
+                           th:href="@{/user/community/{id}/neighbor/my-requests(id=${communityId})}" 
+                           class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i> Back to My Requests
+                        </a>
+                        <a th:unless="${isRequester}" 
+                           th:href="@{/user/community/{id}/neighbor/help-requests(id=${communityId})}" 
+                           class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i> Back to Help Requests
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-5">
+                <!-- Chat Section -->
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-comments me-2"></i> Messages
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chat-container" id="chatContainer">
+                            <!-- No messages state -->
+                            <div th:if="${messages.isEmpty()}" class="text-center text-muted py-5">
+                                <i class="fas fa-comments fa-3x mb-3"></i>
+                                <p>No messages yet. Start the conversation!</p>
+                            </div>
+                            
+                            <!-- Messages -->
+                            <div th:each="message : ${messages}" class="chat-message">
+                                <div th:class="${message.sender.id == currentUserId ? 'message-sender' : 'message-receiver'}">
+                                    <div class="message-content">
+                                        <div class="fw-bold" 
+                                             th:text="${message.sender.id == currentUserId ? 'You' : usernames.get(message.sender.id)}">
+                                            Sender Name
+                                        </div>
+                                        <div th:text="${message.message}">Message content goes here...</div>
+                                        <div class="message-time" 
+                                             th:text="${#temporals.format(message.sentAt, 'MMM dd, HH:mm')}">
+                                            Time
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Message Input -->
+                        <form id="messageForm">
+                            <div class="input-group">
+                                <input type="text" id="messageInput" class="form-control" 
+                                       placeholder="Type your message here..." 
+                                       th:disabled="${request.isResolved}">
+                                <button type="submit" class="btn btn-success" 
+                                        id="sendMessageBtn" 
+                                        th:disabled="${request.isResolved}">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                            <div th:if="${request.isResolved}" class="text-muted small mt-2">
+                                <i class="fas fa-info-circle me-1"></i> This request has been resolved. New messages cannot be sent.
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Phone Contact Information -->
+                <div th:if="${request.allowPhone && !isRequester}" class="card mt-3">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-phone-alt me-2"></i> Contact Information
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p>
+                            <strong>Phone:</strong> 
+                            <span th:text="${request.requester.phone}">555-555-5555</span>
+                        </p>
+                        <p class="text-muted small mb-0">
+                            <i class="fas fa-info-circle me-1"></i> 
+                            The requester has allowed phone contact for this request.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Scroll to bottom of chat container
+            const chatContainer = document.getElementById('chatContainer');
+            if (chatContainer) {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+            
+            // Handle message form submission
+            const messageForm = document.getElementById('messageForm');
+            const messageInput = document.getElementById('messageInput');
+            
+            if (messageForm) {
+                messageForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const message = messageInput.value.trim();
+                    if (!message) return;
+                    
+                    // Determine receiver ID
+                    const currentUserId = /*[[${currentUserId}]]*/ 0;
+                    const requesterId = /*[[${request.requester.id}]]*/ 0;
+                    const receiverId = currentUserId === requesterId ? 
+                        // If current user is requester, find the other user from messages
+                        findOtherUserId() : 
+                        // If current user is responder, receiver is the requester
+                        requesterId;
+                    
+                    // Send message
+                    fetch(`/user/community/[[${communityId}]]/neighbor/message/send`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            'requestId': /*[[${request.id}]]*/ 0,
+                            'message': message,
+                            'receiverId': receiverId
+                        })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to send message');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Add message to UI
+                        addMessageToUI('You', message, true, new Date());
+                        
+                        // Clear input
+                        messageInput.value = '';
+                    })
+                    .catch(error => {
+                        console.error('Error sending message:', error);
+                        alert('Failed to send message. Please try again.');
+                    });
+                });
+            }
+            
+            // Function to find the ID of the other user in the conversation
+            function findOtherUserId() {
+                const messages = /*[[${messages}]]*/ [];
+                const currentUserId = /*[[${currentUserId}]]*/ 0;
+                
+                // Find a message where current user is not the sender
+                const otherUserMessage = messages.find(message => message.sender.id !== currentUserId);
+                
+                if (otherUserMessage) {
+                    return otherUserMessage.sender.id;
+                }
+                
+                // If no messages from other user, find unique user IDs from all messages
+                const userIds = new Set();
+                messages.forEach(message => {
+                    userIds.add(message.sender.id);
+                    userIds.add(message.receiver.id);
+                });
+                
+                // Remove current user ID
+                userIds.delete(currentUserId);
+                
+                // Return the first (and should be only) other user ID
+                return userIds.size > 0 ? Array.from(userIds)[0] : null;
+            }
+            
+            // Function to add a message to the UI
+            function addMessageToUI(sender, message, isSender, timestamp) {
+                const chatContainer = document.getElementById('chatContainer');
+                
+                // Remove "no messages" state if it exists
+                const noMessagesDiv = chatContainer.querySelector('.text-center.text-muted.py-5');
+                if (noMessagesDiv) {
+                    noMessagesDiv.remove();
+                }
+                
+                // Create message element
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'chat-message';
+                
+                const messageContentContainer = document.createElement('div');
+                messageContentContainer.className = isSender ? 'message-sender' : 'message-receiver';
+                
+                const messageContent = document.createElement('div');
+                messageContent.className = 'message-content';
+                
+                const senderElement = document.createElement('div');
+                senderElement.className = 'fw-bold';
+                senderElement.textContent = sender;
+                
+                const messageText = document.createElement('div');
+                messageText.textContent = message;
+                
+                const messageTime = document.createElement('div');
+                messageTime.className = 'message-time';
+                messageTime.textContent = formatDate(timestamp);
+                
+                // Assemble message
+                messageContent.appendChild(senderElement);
+                messageContent.appendChild(messageText);
+                messageContent.appendChild(messageTime);
+                messageContentContainer.appendChild(messageContent);
+                messageDiv.appendChild(messageContentContainer);
+                
+                // Add to chat container
+                chatContainer.appendChild(messageDiv);
+                
+                // Scroll to bottom
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+            
+            // Format date helper
+            function formatDate(date) {
+                const options = { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+                return new Date(date).toLocaleDateString('en-US', options);
+            }
+        });
+    </script>
+</body>
+</html>

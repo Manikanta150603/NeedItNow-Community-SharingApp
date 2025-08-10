@@ -1,0 +1,416 @@
+<!-- Community Form Fragment -->
+<div class="community-form-container" id="communityFormContainer" style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; justify-content: center; align-items: center; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); padding: 2rem;">
+    <div class="form-modal" style="background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1rem; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5), 0 0 40px rgba(168, 85, 247, 0.2); position: relative; animation: slideUp 0.3s ease forwards;">
+        
+        <!-- Card pattern overlay -->
+        <div style="position: absolute; inset: 0; opacity: 0.03; background-image: linear-gradient(135deg, #fff 0.5px, transparent 0.5px), linear-gradient(45deg, #fff 0.5px, transparent 0.5px); background-size: 30px 30px; border-radius: 1rem; pointer-events: none;"></div>
+        
+        <div class="form-header" style="padding: 24px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); position: relative;">
+            <div class="header-content" style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 2.5rem; height: 2.5rem; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.1); display: flex; align-items: center; justify-content: center; background: rgba(168, 85, 247, 0.2);">
+                    <i class="fas fa-users" style="font-size: 18px; color: #a855f7;"></i>
+                </div>
+                <h3 style="margin: 0; font-size: 20px; color: #fff; font-weight: 600; background: linear-gradient(to bottom, #fff, rgba(255, 255, 255, 0.8)); -webkit-background-clip: text; background-clip: text; color: transparent;">Create New Community</h3>
+            </div>
+            <button class="close-btn" id="closeFormBtn" aria-label="Close" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); cursor: pointer; font-size: 1rem; position: absolute; top: 20px; right: 20px; color: rgba(255, 255, 255, 0.6); transition: all 0.3s ease; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="form-body" style="padding: 25px 24px;">
+            <form id="communityForm" th:action="@{/user/community/create}" method="post" style="margin: 0;">
+                <!-- Community Name -->
+                <div class="form-group" style="margin-bottom: 20px; position: relative;">
+                    <label for="communityName" style="display: block; margin-bottom: 8px; font-weight: 500; color: rgba(255, 255, 255, 0.6); font-size: 14px;">
+                        Community Name <span style="color: #ef4444;">*</span>
+                    </label>
+                    <div style="position: relative;">
+                        <i class="fas fa-users" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: rgba(255, 255, 255, 0.4); transition: color 0.3s ease;"></i>
+                        <input type="text" id="communityName" name="name" required 
+                               placeholder="Enter community name" maxlength="100"
+                               style="width: 100%; padding: 12px 15px 12px 40px; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; font-size: 15px; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.05); color: #fff; outline: none;" 
+                               onfocus="this.parentElement.querySelector('i').style.color = '#fff'; this.style.background = 'rgba(255, 255, 255, 0.1)'; this.style.border = '1px solid rgba(255, 255, 255, 0.2)';" 
+                               onblur="this.parentElement.querySelector('i').style.color = 'rgba(255, 255, 255, 0.4)'; this.style.background = 'rgba(255, 255, 255, 0.05)'; this.style.border = '1px solid rgba(255, 255, 255, 0.1)';">
+                    </div>
+                </div>
+                
+                <!-- Address -->
+                <div class="form-group" style="margin-bottom: 20px; position: relative;">
+                    <label for="communityAddress" style="display: block; margin-bottom: 8px; font-weight: 500; color: rgba(255, 255, 255, 0.6); font-size: 14px;">
+                        Complete Address <span style="color: #ef4444;">*</span>
+                    </label>
+                    <div style="position: relative;">
+                        <i class="fas fa-map-marker-alt" style="position: absolute; left: 12px; top: 12px; width: 16px; height: 16px; color: rgba(255, 255, 255, 0.4); transition: color 0.3s ease;"></i>
+                        <textarea id="communityAddress" name="address" required 
+                               placeholder="Enter complete address" rows="2"
+                               style="width: 100%; padding: 12px 15px 12px 40px; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; font-size: 15px; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.05); color: #fff; resize: vertical; outline: none;" 
+                               onfocus="this.parentElement.querySelector('i').style.color = '#fff'; this.style.background = 'rgba(255, 255, 255, 0.1)'; this.style.border = '1px solid rgba(255, 255, 255, 0.2)';" 
+                               onblur="this.parentElement.querySelector('i').style.color = 'rgba(255, 255, 255, 0.4)'; this.style.background = 'rgba(255, 255, 255, 0.05)'; this.style.border = '1px solid rgba(255, 255, 255, 0.1)';"></textarea>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                    <!-- City -->
+                    <div class="form-group">
+                        <label for="communityCity" style="display: block; margin-bottom: 8px; font-weight: 500; color: rgba(255, 255, 255, 0.6); font-size: 14px;">
+                            City <span style="color: #ef4444;">*</span>
+                        </label>
+                        <div style="position: relative;">
+                            <i class="fas fa-city" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: rgba(255, 255, 255, 0.4); transition: color 0.3s ease;"></i>
+                            <input type="text" id="communityCity" name="city" required 
+                                   placeholder="City"
+                                   style="width: 100%; padding: 12px 15px 12px 40px; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; font-size: 15px; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.05); color: #fff; outline: none;" 
+                                   onfocus="this.parentElement.querySelector('i').style.color = '#fff'; this.style.background = 'rgba(255, 255, 255, 0.1)'; this.style.border = '1px solid rgba(255, 255, 255, 0.2)';" 
+                                   onblur="this.parentElement.querySelector('i').style.color = 'rgba(255, 255, 255, 0.4)'; this.style.background = 'rgba(255, 255, 255, 0.05)'; this.style.border = '1px solid rgba(255, 255, 255, 0.1)';">
+                        </div>
+                    </div>
+                    
+                    <!-- State -->
+                    <div class="form-group">
+                        <label for="communityState" style="display: block; margin-bottom: 8px; font-weight: 500; color: rgba(255, 255, 255, 0.6); font-size: 14px;">
+                            State <span style="color: #ef4444;">*</span>
+                        </label>
+                        <div style="position: relative;">
+                            <i class="fas fa-map" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: rgba(255, 255, 255, 0.4); transition: color 0.3s ease;"></i>
+                            <input type="text" id="communityState" name="state" required 
+                                   placeholder="State"
+                                   style="width: 100%; padding: 12px 15px 12px 40px; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; font-size: 15px; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.05); color: #fff; outline: none;" 
+                                   onfocus="this.parentElement.querySelector('i').style.color = '#fff'; this.style.background = 'rgba(255, 255, 255, 0.1)'; this.style.border = '1px solid rgba(255, 255, 255, 0.2)';" 
+                                   onblur="this.parentElement.querySelector('i').style.color = 'rgba(255, 255, 255, 0.4)'; this.style.background = 'rgba(255, 255, 255, 0.05)'; this.style.border = '1px solid rgba(255, 255, 255, 0.1)';">
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                    <!-- Pincode -->
+                    <div class="form-group">
+                        <label for="communityPincode" style="display: block; margin-bottom: 8px; font-weight: 500; color: rgba(255, 255, 255, 0.6); font-size: 14px;">
+                            Pincode <span style="color: #ef4444;">*</span>
+                        </label>
+                        <div style="position: relative;">
+                            <i class="fas fa-hashtag" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: rgba(255, 255, 255, 0.4); transition: color 0.3s ease;"></i>
+                            <input type="text" id="communityPincode" name="pincode" required 
+                                   placeholder="Pincode" pattern="[0-9]+"
+                                   style="width: 100%; padding: 12px 15px 12px 40px; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; font-size: 15px; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.05); color: #fff; outline: none;" 
+                                   onfocus="this.parentElement.querySelector('i').style.color = '#fff'; this.style.background = 'rgba(255, 255, 255, 0.1)'; this.style.border = '1px solid rgba(255, 255, 255, 0.2)';" 
+                                   onblur="this.parentElement.querySelector('i').style.color = 'rgba(255, 255, 255, 0.4)'; this.style.background = 'rgba(255, 255, 255, 0.05)'; this.style.border = '1px solid rgba(255, 255, 255, 0.1)';">
+                        </div>
+                    </div>
+                    
+                    <!-- Country -->
+                    <div class="form-group">
+                        <label for="communityCountry" style="display: block; margin-bottom: 8px; font-weight: 500; color: rgba(255, 255, 255, 0.6); font-size: 14px;">
+                            Country <span style="color: #ef4444;">*</span>
+                        </label>
+                        <div style="position: relative;">
+                            <i class="fas fa-flag" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: rgba(255, 255, 255, 0.4);"></i>
+                            <input type="text" id="communityCountry" name="country" required 
+                                   value="India" readonly
+                                   style="width: 100%; padding: 12px 15px 12px 40px; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; font-size: 15px; background: rgba(255, 255, 255, 0.02); color: rgba(255, 255, 255, 0.6); cursor: not-allowed; outline: none;">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Location Detection -->
+                <div class="form-group" style="margin-bottom: 25px; padding: 20px; background: rgba(255, 255, 255, 0.05); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(5px);">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 2rem; height: 2rem; border-radius: 50%; background: rgba(168, 85, 247, 0.2); display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-map-marker-alt" style="color: #a855f7; font-size: 14px;"></i>
+                            </div>
+                            <span style="font-weight: 500; color: #fff; font-size: 15px;">Current Location</span>
+                        </div>
+                        <button type="button" id="detectLocationBtn" 
+                                style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: #fff; color: #000; border: none; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden;">
+                            <i class="fas fa-location-arrow" style="font-size: 12px;"></i>
+                            Detect My Location
+                        </button>
+                    </div>
+                    <div id="locationStatus" style="font-size: 13px; color: rgba(255, 255, 255, 0.7); margin-top: 8px; padding: 8px 12px; background: rgba(255, 255, 255, 0.02); border-radius: 6px; border-left: 3px solid rgba(168, 85, 247, 0.5);">
+                        Click the button to detect your current location
+                    </div>
+                    <input type="hidden" id="latitude" name="latitude">
+                    <input type="hidden" id="longitude" name="longitude">
+                </div>
+                
+                <!-- Form Actions -->
+                <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                    <button type="button" id="cancelFormBtn" style="padding: 12px 24px; background: rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(5px);">
+                        Cancel
+                    </button>
+                    <button type="submit" style="padding: 12px 24px; background: #fff; color: #000; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden;">
+                        Create Community
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .close-btn:hover {
+        background: rgba(255, 255, 255, 0.1) !important;
+        color: #fff !important;
+        transform: scale(1.05);
+    }
+    
+    #detectLocationBtn:hover {
+        transform: scale(1.02);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    
+    #detectLocationBtn:active {
+        transform: scale(0.98);
+    }
+    
+    #cancelFormBtn:hover {
+        background: rgba(255, 255, 255, 0.1) !important;
+        color: #fff !important;
+        transform: translateY(-1px);
+    }
+    
+    button[type="submit"]:hover {
+        transform: scale(1.02);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    
+    button[type="submit"]:active {
+        transform: scale(0.98);
+    }
+    
+    input::placeholder, textarea::placeholder {
+        color: rgba(255, 255, 255, 0.3) !important;
+    }
+    
+    .form-modal {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+.form-modal::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+</style>
+
+<script>
+    // Function to show the community form
+    function showCommunityForm() {
+        const formContainer = document.getElementById('communityFormContainer');
+        if (formContainer) {
+            formContainer.style.display = 'flex';
+            // Trigger reflow
+            void formContainer.offsetWidth;
+            formContainer.style.opacity = '1';
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+
+    // Function to hide the community form
+    function hideCommunityForm() {
+        const formContainer = document.getElementById('communityFormContainer');
+        if (formContainer) {
+            formContainer.style.opacity = '0';
+            setTimeout(() => {
+                formContainer.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+    }
+
+    // Function to update form fields with location data
+    function updateFormWithLocation(position) {
+        console.log('Geolocation success:', position);
+        const { latitude, longitude } = position.coords;
+        const statusElement = document.getElementById('locationStatus');
+        
+        // Update hidden fields
+        document.getElementById('latitude').value = latitude;
+        document.getElementById('longitude').value = longitude;
+        
+        // Show loading state
+        statusElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting address details...';
+        
+        // Use reverse geocoding to get address details (using Nominatim)
+        console.log('Fetching address for:', latitude, longitude);
+        const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`;
+        console.log('Request URL:', url);
+        
+        fetch(url, {
+            headers: {
+                'Accept': 'application/json',
+                'User-Agent': 'NeedItNowApp/1.0 (your-email@example.com)'
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const address = data.address || {};
+                const addressParts = [];
+                
+                // Build address parts
+                if (address.road) addressParts.push(address.road);
+                if (address.house_number) addressParts.push(address.house_number);
+                if (address.village) addressParts.push(address.village);
+                if (address.town) addressParts.push(address.town);
+                if (address.city) addressParts.push(address.city);
+                
+                // Update address field
+                const addressField = document.getElementById('communityAddress');
+                if (addressField) {
+                    addressField.value = addressParts.join(', ');
+                }
+                
+                // Update city field
+                const cityField = document.getElementById('communityCity');
+                if (cityField) {
+                    cityField.value = address.city || address.town || address.village || '';
+                }
+                
+                // Update state field
+                const stateField = document.getElementById('communityState');
+                if (stateField) {
+                    stateField.value = address.state || '';
+                }
+                
+                // Update pincode field
+                const pincodeField = document.getElementById('communityPincode');
+                if (pincodeField) {
+                    pincodeField.value = address.postcode || '';
+                }
+                
+                // Update status message
+                const locationName = address.road || 'Current location';
+                const locationCity = address.city || address.town || '';
+                statusElement.innerHTML = `
+                    <i class="fas fa-check-circle" style="color: #10b981;"></i>
+                    <span>Location detected: ${locationName}${locationCity ? ', ' + locationCity : ''}</span>
+                `;
+            })
+            .catch(error => {
+                console.error('Error getting address details:', error);
+                statusElement.innerHTML = `
+                    <i class="fas fa-check-circle" style="color: #10b981;"></i>
+                    <span>Location detected (${latitude.toFixed(6)}, ${longitude.toFixed(6)}) - Could not fetch address details</span>
+                `;
+            });
+    }
+
+    // Function to handle location error
+    function handleLocationError(error) {
+        console.error('Location error:', error);
+        const statusElement = document.getElementById('locationStatus');
+        let errorMessage = 'Unable to retrieve your location';
+        
+        switch(error.code) {
+            case error.PERMISSION_DENIED:
+                errorMessage = 'Location access was denied. Please enable location services in your browser settings.';
+                break;
+            case error.POSITION_UNAVAILABLE:
+                errorMessage = 'Location information is unavailable. Please check your internet connection and try again.';
+                break;
+            case error.TIMEOUT:
+                errorMessage = 'The request to get your location timed out. Please try again.';
+                break;
+            case error.UNKNOWN_ERROR:
+                errorMessage = 'An unknown error occurred while getting your location. Please try again later.';
+                break;
+        }
+        
+        const errorHTML = `
+            <div style="color: #ef4444; background: rgba(239, 68, 68, 0.1); padding: 10px; border-radius: 4px; border-left: 3px solid #ef4444;">
+                <i class="fas fa-exclamation-circle"></i> ${errorMessage}
+            </div>
+        `;
+        statusElement.innerHTML = errorHTML;
+    }
+
+    // Initialize form when document is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Close form when clicking the close button
+        const closeBtn = document.getElementById('closeFormBtn');
+        const cancelBtn = document.getElementById('cancelFormBtn');
+        const detectLocationBtn = document.getElementById('detectLocationBtn');
+        const formContainer = document.getElementById('communityFormContainer');
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', hideCommunityForm);
+        }
+        
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', hideCommunityForm);
+        }
+
+        // Handle location detection
+        if (detectLocationBtn) {
+            detectLocationBtn.addEventListener('click', function() {
+                console.log('Detect location button clicked');
+                const statusElement = document.getElementById('locationStatus');
+                const button = this;
+                const originalButtonHTML = button.innerHTML;
+                
+                // Disable button and show loading state
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Detecting...';
+                statusElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Requesting location access...';
+                
+                if (navigator.geolocation) {
+                    console.log('Requesting geolocation...');
+                    navigator.geolocation.getCurrentPosition(
+                        function(position) {
+                            console.log('Geolocation success, updating form...');
+                            statusElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting address details...';
+                            updateFormWithLocation(position);
+                            button.disabled = false;
+                            button.innerHTML = originalButtonHTML;
+                        },
+                        function(error) {
+                            console.error('Geolocation error:', error);
+                            handleLocationError(error);
+                            button.disabled = false;
+                            button.innerHTML = originalButtonHTML;
+                        },
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 10000,
+                            maximumAge: 0
+                        }
+                    );
+                } else {
+                    console.error('Geolocation not supported');
+                    statusElement.innerHTML = '<i class="fas fa-exclamation-circle" style="color: #ef4444;"></i> Geolocation is not supported by your browser';
+                    button.disabled = false;
+                    button.innerHTML = originalButtonHTML;
+                }
+            });
+        }
+
+        // Close when clicking outside the form
+        if (formContainer) {
+            formContainer.addEventListener('click', function(e) {
+                if (e.target === formContainer) {
+                    hideCommunityForm();
+                }
+            });
+        }
+
+        // Close when pressing Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && formContainer && formContainer.style.display === 'flex') {
+                hideCommunityForm();
+            }
+        });
+    });
+</script>

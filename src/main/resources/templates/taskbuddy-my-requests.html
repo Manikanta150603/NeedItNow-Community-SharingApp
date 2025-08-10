@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Task Requests | TaskBuddy</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+      /* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+    background: #000;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Hide scrollbar but keep functionality */
+html {
+    scrollbar-width: none;  /* For Firefox */
+    -ms-overflow-style: none;  /* For Internet Explorer and Edge */
+}
+
+/* For Chrome, Safari, and Opera */
+html::-webkit-scrollbar {
+    display: none;
+}
+
+/* Ensure the page still takes full height and can scroll */
+body {
+    overflow-y: scroll;
+    -ms-overflow-style: none;  /* For Internet Explorer and Edge */
+    scrollbar-width: none;  /* For Firefox */
+}
+
+/* For Chrome, Safari, and Opera */
+body::-webkit-scrollbar {
+    display: none;
+}
+
+/* Background effects */
+.bg-gradient {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(168, 85, 247, 0.4), rgba(147, 51, 234, 0.5), #000);
+    z-index: -3;
+}
+
+.noise-overlay {
+    position: fixed;
+    inset: 0;
+    opacity: 0.03;
+    mix-blend-mode: soft-light;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    z-index: -2;
+}
+
+/* Add background elements to body */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(168, 85, 247, 0.4), rgba(147, 51, 234, 0.5), #000);
+    z-index: -3;
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    opacity: 0.03;
+    mix-blend-mode: soft-light;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    z-index: -2;
+}
+
+/* Dashboard Header */
+.dashboard-header {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 2rem 0;
+    position: relative;
+    z-index: 10;
+}
+
+.dashboard-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.dashboard-header .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    position: relative;
+    z-index: 1;
+}
+
+.dashboard-header h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    background: linear-gradient(to bottom, #fff, rgba(255, 255, 255, 0.8));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 0.5rem;
+    animation: slide-up 0.8s ease forwards;
+}
+
+.dashboard-header p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.1rem;
+    margin-bottom: 0;
+    max-width: 600px;
+    line-height: 1.6;
+}
+
+/* Back Button - Fixed and Enhanced */
+.back-btn {
+    display: inline-flex !important;
+    align-items: center;
+    padding: 0.5rem 1.25rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.5rem;
+    color: #fff !important;
+    text-decoration: none !important;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    margin-bottom: 1.5rem;
+    animation: slide-up 0.8s ease 0.1s forwards;
+    opacity: 1 !important;
+    position: relative;
+    z-index: 5;
+}
+
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    color: #fff !important;
+    text-decoration: none !important;
+    border-color: rgba(168, 85, 247, 0.4);
+}
+
+.back-btn:active {
+    transform: translateY(0);
+}
+
+.back-btn i {
+   
+    transition: transform 0.3s ease;
+}
+
+.back-btn:hover i {
+    transform: translateX(-3px);
+}
+
+/* Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    position: relative;
+    z-index: 5;
+}
+
+/* Page Header - Enhanced Styling for "My Task Requests" */
+h1, h2, h3, h4, h5, h6 {
+    color: #fff;
+    font-weight: 600;
+}
+
+.h3 {
+    font-size: 2rem !important;
+    font-weight: 700 !important;
+    background: linear-gradient(135deg, #fff 0%, #a855f7 40%, #c084fc 60%, #fff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent !important;
+    position: relative;
+    margin-bottom: 1rem !important;
+    text-shadow: none;
+}
+
+.h3::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(to right, #a855f7, #c084fc, transparent);
+    border-radius: 2px;
+    box-shadow: 0 2px 8px rgba(168, 85, 247, 0.4);
+}
+
+/* Text Utilities */
+.text-muted {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.text-white-50 {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.text-success {
+    color: #22c55e !important;
+}
+
+.text-primary {
+    color: #a855f7 !important;
+}
+
+.text-danger {
+    color: #ef4444 !important;
+}
+
+.text-warning {
+    color: #f59e0b !important;
+}
+
+.text-info {
+    color: #3b82f6 !important;
+}
+
+.text-dark {
+    color: #1f2937 !important;
+}
+
+.small {
+    font-size: 0.875rem;
+}
+
+/* Buttons */
+.btn {
+    border-radius: 0.5rem;
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
+
+.btn:hover::after {
+    transform: translateX(100%);
+}
+
+.btn-primary {
+    background: rgba(168, 85, 247, 0.2);
+    color: #a855f7;
+    border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.btn-primary:hover {
+    background: rgba(168, 85, 247, 0.3);
+    color: #a855f7;
+    transform: translateY(-2px);
+}
+
+.btn-outline-primary {
+    background: rgba(168, 85, 247, 0.1);
+    color: #a855f7;
+    border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.btn-outline-primary:hover {
+    background: rgba(168, 85, 247, 0.2);
+    color: #a855f7;
+    transform: translateY(-2px);
+}
+
+.btn-outline-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-outline-secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.btn-outline-danger {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.btn-outline-danger:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    transform: translateY(-2px);
+}
+
+.btn-danger {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.btn-danger:hover {
+    background: rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: rgba(107, 114, 128, 0.2);
+    color: #9ca3af;
+    border: 1px solid rgba(107, 114, 128, 0.3);
+}
+
+.btn-secondary:hover {
+    background: rgba(107, 114, 128, 0.3);
+    color: #9ca3af;
+    transform: translateY(-2px);
+}
+
+.btn-success {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.btn-success:hover {
+    background: rgba(34, 197, 94, 0.3);
+    color: #22c55e;
+    transform: translateY(-2px);
+}
+
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+/* Cards */
+.card {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    color: #fff;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    border-radius: 1rem;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(168, 85, 247, 0.3);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.card:hover::before {
+    opacity: 1;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.card-title {
+    color: #fff;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    background: linear-gradient(to bottom, #fff, rgba(255, 255, 255, 0.9));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.card-text {
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.5;
+}
+
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+/* Task Card Specific */
+.task-card {
+    height: 100%;
+    animation: slide-up 0.8s ease forwards;
+}
+
+.task-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+/* Task Priority Borders - Enhanced */
+.task-priority-high {
+    border-left: 4px solid #ef4444;
+    box-shadow: -4px 0 8px rgba(239, 68, 68, 0.3);
+}
+
+.task-priority-medium {
+    border-left: 4px solid #f59e0b;
+    box-shadow: -4px 0 8px rgba(245, 158, 11, 0.3);
+}
+
+.task-priority-low {
+    border-left: 4px solid #22c55e;
+    box-shadow: -4px 0 8px rgba(34, 197, 94, 0.3);
+}
+
+/* Status Section - Enhanced */
+.status-section {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin: 1rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.status-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    border-radius: 2px;
+}
+
+/* Status-specific styling */
+.status-section.bg-success {
+    background: rgba(34, 197, 94, 0.15) !important;
+    border: 1px solid rgba(34, 197, 94, 0.4) !important;
+    color: #22c55e !important;
+}
+
+.status-section.bg-success::before {
+    background: #22c55e;
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+}
+
+.status-section.bg-primary {
+ .status-section.bg-primary {
+    background: rgba(168, 85, 247, 0.15) !important;
+    border: 1px solid rgba(168, 85, 247, 0.4) !important;
+    color: #a855f7 !important;
+}
+
+.status-section.bg-primary::before {
+    background: #a855f7;
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+}
+
+.status-section.bg-warning {
+    background: rgba(245, 158, 11, 0.3) !important;
+    border: 1px solid rgba(245, 158, 11, 0.6) !important;
+    color: #ffffff !important;
+}
+
+.status-section.bg-warning::before {
+    background: #f59e0b;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+}
+
+/* Specific styling for warning status text */
+.status-section.bg-warning .fw-bold,
+.status-section.bg-warning .small {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
+}
+
+.status-section.bg-warning i {
+    color: #fbbf24 !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* General bg classes */
+.bg-success {
+    background: rgba(34, 197, 94, 0.2) !important;
+    color: #22c55e !important;
+    border: 1px solid rgba(34, 197, 94, 0.3) !important;
+}
+
+.bg-primary {
+    background: rgba(168, 85, 247, 0.2) !important;
+    color: #a855f7 !important;
+    border: 1px solid rgba(168, 85, 247, 0.3) !important;
+}
+
+.bg-warning {
+    background: rgba(245, 158, 11, 0.25) !important;
+    color: #fbbf24 !important;
+    border: 1px solid rgba(245, 158, 11, 0.4) !important;
+}
+
+.bg-info {
+    background: rgba(59, 130, 246, 0.2) !important;
+    color: #3b82f6 !important;
+    border: 1px solid rgba(59, 130, 246, 0.3) !important;
+}
+
+.bg-danger {
+    background: rgba(239, 68, 68, 0.2) !important;
+    color: #ef4444 !important;
+    border: 1px solid rgba(239, 68, 68, 0.3) !important;
+}
+
+.bg-secondary {
+    background: rgba(107, 114, 128, 0.2) !important;
+    color: #9ca3af !important;
+    border: 1px solid rgba(107, 114, 128, 0.3) !important;
+}
+
+.bg-opacity-10 {
+    opacity: 0.15 !important;
+}
+
+/* Badges - Enhanced */
+.badge {
+    border-radius: 1rem;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    backdrop-filter: blur(5px);
+    position: relative;
+    overflow: hidden;
+}
+
+.badge::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.6s ease;
+}
+
+.badge:hover::before {
+    left: 100%;
+}
+
+.badge.bg-success {
+    background: rgba(34, 197, 94, 0.3) !important;
+    color: #22c55e !important;
+    border: 1px solid rgba(34, 197, 94, 0.5) !important;
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+}
+
+.badge.bg-primary {
+    background: rgba(168, 85, 247, 0.3) !important;
+    color: #a855f7 !important;
+    border: 1px solid rgba(168, 85, 247, 0.5) !important;
+    box-shadow: 0 2px 8px rgba(168, 85, 247, 0.3);
+}
+
+.badge.bg-warning {
+    background: rgba(245, 158, 11, 0.3) !important;
+    color: #f59e0b !important;
+    border: 1px solid rgba(245, 158, 11, 0.5) !important;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+}
+
+.badge.bg-danger {
+    background: rgba(239, 68, 68, 0.3) !important;
+    color: #ef4444 !important;
+    border: 1px solid rgba(239, 68, 68, 0.5) !important;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+.rounded-pill {
+    border-radius: 50rem !important;
+}
+
+/* Task Meta - Enhanced */
+.task-meta {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+}
+
+.task-meta i {
+    color: rgba(168, 85, 247, 0.8);
+    width: 16px;
+    margin-right: 0.5rem;
+}
+
+/* Alert */
+.alert {
+    background: rgba(168, 85, 247, 0.1);
+    border: 1px solid rgba(168, 85, 247, 0.2);
+    border-radius: 0.75rem;
+    color: rgba(255, 255, 255, 0.9);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.alert-info {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+.alert-primary {
+    background: rgba(168, 85, 247, 0.1);
+    border-color: rgba(168, 85, 247, 0.2);
+}
+
+/* Modal Styles */
+.modal {
+    backdrop-filter: blur(10px);
+}
+
+.modal.fade {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.modal-dialog {
+    margin: 1.75rem auto;
+}
+
+.modal-content {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    color: #fff;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5), 0 0 40px rgba(168, 85, 247, 0.2);
+    position: relative;
+    animation: slideUp 0.3s ease forwards;
+}
+
+.modal-content::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.03;
+    background-image: linear-gradient(135deg, #fff 0.5px, transparent 0.5px), linear-gradient(45deg, #fff 0.5px, transparent 0.5px);
+    background-size: 30px 30px;
+    border-radius: 1rem;
+    pointer-events: none;
+}
+
+.modal-header {
+    padding: 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem 1rem 0 0;
+    position: relative;
+}
+
+.modal-header.bg-success {
+    background: rgba(34, 197, 94, 0.2);
+}
+
+.modal-header.bg-info {
+    background: rgba(59, 130, 246, 0.2);
+}
+
+.modal-header.bg-primary {
+    background: rgba(168, 85, 247, 0.2);
+}
+
+.modal-title {
+    color: #fff;
+    font-weight: 600;
+    font-size: 20px;
+    background: linear-gradient(to bottom, #fff, rgba(255, 255, 255, 0.8));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.btn-close, .btn-close-white {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 50% !important;
+    width: 28px !important;
+    height: 28px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    opacity: 0.8 !important;
+    transition: all 0.3s ease !important;
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    filter: none !important;
+}
+
+.btn-close::before, .btn-close-white::before {
+    content: '×' !important;
+    color: #ff6b6b !important;
+    font-size: 24px !important;
+    line-height: 1 !important;
+    position: relative !important;
+    top: -1px !important;
+}
+
+.btn-close, .btn-close-white {
+    background-image: none !important;
+}
+
+.btn-close:hover, .btn-close-white:hover {
+    background: rgba(220, 38, 38, 0.4) !important;
+    border-color: rgba(220, 38, 38, 0.6) !important;
+    transform: rotate(90deg) scale(1.1) !important;
+    opacity: 1 !important;
+}
+
+.modal-body {
+    padding: 25px 24px;
+}
+
+.modal-footer {
+    padding: 20px 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 0 0 1rem 1rem;
+}
+
+/* Spinner */
+.spinner-border {
+    width: 2rem;
+    height: 2rem;
+    border-width: 0.25rem;
+    border-style: solid;
+    border-color: transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spinner-border 0.75s linear infinite;
+}
+
+.spinner-border.text-primary {
+    border-top-color: #a855f7;
+}
+
+@keyframes spinner-border {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* Contact Info Modal */
+.contact-info i {
+    color: rgba(168, 85, 247, 0.8);
+}
+
+/* Toast Styles */
+.toast-container {
+    z-index: 1100;
+}
+
+.toast {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    color: #fff;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.toast-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.75rem 1rem;
+}
+
+.toast-header.bg-success {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+}
+
+.toast-header.bg-danger {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.toast-body {
+    padding: 1rem;
+}
+
+/* Utility Classes */
+.d-flex {
+    display: flex !important;
+}
+
+.d-none {
+    display: none !important;
+}
+
+.d-block {
+    display: block !important;
+}
+
+.d-inline-flex {
+    display: inline-flex !important;
+}
+
+.justify-content-between {
+    justify-content: space-between !important;
+}
+
+.justify-content-center {
+    justify-content: center !important;
+}
+
+.justify-content-start {
+    justify-content: flex-start !important;
+}
+
+.justify-content-end {
+    justify-content: flex-end !important;
+}
+
+.align-items-center {
+    align-items: center !important;
+}
+
+.align-items-start {
+    align-items: flex-start !important;
+}
+
+.align-items-end {
+    align-items: flex-end !important;
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+.text-end {
+    text-align: right !important;
+}
+
+.text-start {
+    text-align: left !important;
+}
+
+.w-100 {
+    width: 100% !important;
+}
+
+.h-100 {
+    height: 100% !important;
+}
+
+.flex-column {
+    flex-direction: column !important;
+}
+
+.flex-wrap {
+    flex-wrap: wrap !important;
+}
+
+.gap-2 {
+    gap: 0.5rem !important;
+}
+
+.gap-4 {
+    gap: 1.5rem !important;
+}
+
+.position-relative {
+    position: relative !important;
+}
+
+.position-absolute {
+    position: absolute !important;
+}
+
+.position-fixed {
+    position: fixed !important;
+}
+
+.top-0 {
+    top: 0 !important;
+}
+
+.end-0 {
+    right: 0 !important;
+}
+
+.bottom-0 {
+    bottom: 0 !important;
+}
+
+.fw-bold {
+    font-weight: bold !important;
+}
+
+/* Margin Utilities */
+.m-0
+
+/* Enhanced status section text visibility */
+.status-section .fw-bold {
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+    margin-bottom: 0.25rem !important;
+}
+
+.status-section .small {
+    font-size: 0.8rem !important;
+    opacity: 0.9 !important;
+}
+
+/* Status section icons enhancement */
+.status-section i {
+    font-size: 1.1rem !important;
+    margin-right: 0.5rem !important;
+}
+
+/* Badge positioning fix */
+.position-absolute.top-0.end-0 {
+    z-index: 10 !important;
+}
+
+.position-absolute.top-0.end-0 .badge {
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 0.75rem !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Task card hover enhancement */
+.task-card:hover .status-section {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+    </style>
+</head>
+<body>
+       
+<div class="dashboard-header">
+    <div class="container">
+        <a th:href="@{/user/community/{communityId}(communityId=${communityId})}" class="back-btn">
+            <i class="fas fa-arrow-left me-2"></i> Back to Community
+        </a>
+        <h1>
+            <i class="fas fa-user-edit"></i> My Requests
+        </h1>
+        <p class="mb-0">Track all tasks you've posted and their status.</p>
+    </div>
+</div>
+
+    <div class="container py-5">
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                
+                <h1 class="h3 mb-0">My Task Requests</h1>
+                <p class="text-muted mb-0">View and manage tasks you've posted in this community</p>
+            </div>
+            <a th:href="@{/user/community/{id}/taskbuddy/create-task(id=${communityId})}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Create New Task
+            </a>
+        </div>
+
+        <!-- Debug Info (temporary) -->
+        <div class="alert alert-info" th:if="${myTasks == null}" role="alert">
+            <h5>Debug Info:</h5>
+            <p>myTasks is null</p>
+            <p>communityId: <span th:text="${communityId}"></span></p>
+            <p>communityName: <span th:text="${communityName}"></span></p>
+        </div>
+        
+        <!-- Tasks Grid -->
+        <div class="row">
+            <div th:if="${myTasks == null or myTasks.empty}" class="col-12">
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-tasks fa-3x text-muted mb-3"></i>
+                        <h4>No tasks found</h4>
+                        <p class="text-muted">You haven't created any task requests in this community yet.</p>
+                        <a th:href="@{/user/community/{id}/taskbuddy/create-task(id=${communityId})}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Create Your First Task
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div th:each="task : ${myTasks}" class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 task-card position-relative" th:classappend="${task.priority != null ? 'task-priority-' + task.priority.toLowerCase() : ''}">
+                    <!-- Task Status Badge - Top Right Corner -->
+                    <div class="position-absolute top-0 end-0 m-2">
+                        <span th:if="${task.completed}" class="badge bg-success rounded-pill px-3 py-2">
+                            <i class="fas fa-check-circle me-1"></i> Completed
+                        </span>
+                        <span th:if="${!task.completed && task.helper != null}" class="badge bg-primary rounded-pill px-3 py-2">
+                            <i class="fas fa-spinner fa-spin me-1"></i> In Progress
+                        </span>
+                        <span th:if="${!task.completed && task.helper == null}" class="badge bg-warning text-dark rounded-pill px-3 py-2">
+                            <i class="fas fa-hourglass-start me-1"></i> Open
+                        </span>
+                    </div>
+                    
+                    <!-- Task Image -->
+                    <!-- Task Image -->
+<div class="card-img-top task-image d-flex align-items-center justify-content-center"
+     style="height: 200px; background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(147, 51, 234, 0.2)); border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+    <i class="fas fa-shopping-basket text-muted" style="font-size: 4rem; opacity: 0.3;"></i>
+</div>a
+                    
+                    <div class="card-body d-flex flex-column">
+                        <!-- Title and Priority -->
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title mb-0" th:text="${task.title}">Task Title</h5>
+                            <span class="badge" 
+                                  th:class="${'bg-' + (task.priority == 'HIGH' ? 'danger' : (task.priority == 'MEDIUM' ? 'warning text-dark' : 'success'))}"
+                                  th:text="${task.priority}">Priority</span>
+                        </div>
+                        
+                        <!-- Category and Date -->
+                        <p class="card-text small text-muted mb-2">
+                            <i class="fas fa-tag me-1"></i>
+                            <span th:text="${task.category}">Category</span>
+                            <span class="mx-2">•</span>
+                            <i class="far fa-calendar-alt me-1"></i>
+                            <span th:if="${task.dueDate != null}" th:text="${#temporals.format(task.dueDate, 'MMM dd, yyyy')}">Due Date</span>
+                        </p>
+                        
+                        <!-- Description (truncated) -->
+                        <p class="card-text mb-3 text-muted" style="font-size: 0.9rem;" th:text="${#strings.abbreviate(task.description, 120)}">
+                            Task description will be shown here with a maximum length of 120 characters...
+                        </p>
+                        
+                        <!-- Status Section -->
+                        <div class="status-section mb-3 p-2 rounded" 
+                             th:class="${task.completed ? 'bg-success bg-opacity-10 text-success' : 
+                                       (!task.completed && task.helper != null ? 'bg-primary bg-opacity-10 text-primary' : 
+                                       'bg-warning bg-opacity-10 text-white')}">
+                            <div class="d-flex align-items-center">
+                                <i th:class="${task.completed ? 'fas fa-check-circle' : 
+                                               (!task.completed && task.helper != null ? 'fas fa-spinner fa-spin' : 
+                                               'fas fa-hourglass-start')}" 
+                                   class="me-2"></i>
+                                <div>
+                                    <div class="fw-bold" th:text="${task.completed ? 'Task Completed' : 
+                                                                 (!task.completed && task.helper != null ? 'In Progress' : 
+                                                                 'Looking for Helper')}">Status</div>
+                                    <div class="small" th:if="${!task.completed && task.helper != null}">
+                                        Helper assigned
+                                    </div>
+                                    <div class="small" th:if="${task.completed}">
+                                        Completed on <span th:text="${#temporals.format(task.completedDate, 'MMM dd, yyyy')}">date</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Task Meta -->
+                        <div class="task-meta mb-3">
+                            <div class="d-flex flex-wrap">
+                                <div class="me-3 mb-1">
+                                    <i class="fas fa-clock"></i>
+                                    <span th:text="${task.estimatedDuration}">Duration</span>
+                                </div>
+                                <div class="me-3 mb-1">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span th:text="${task.location}">Location</span>
+                                </div>
+                                <div class="me-3 mb-1" th:if="${task.reward != null and task.reward != '' and task.reward != '0'}">
+                                    <i class="fas fa-gift"></i>
+                                    <span th:text="${'$' + task.reward}">Reward</span>
+                                </div>
+                                <div class="me-3 mb-1" th:if="${task.reward == null or task.reward == '' or task.reward == '0'}">
+                                    <i class="fas fa-hands-helping"></i>
+                                    <span>No reward, just gratitude! 🙏</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="d-flex mt-auto">
+                            <button type="button" 
+                                    class="btn btn-sm btn-outline-primary me-2"
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#taskResponsesModal"
+                                    th:data-task-id="${task.id}"
+                                    th:data-task-title="${task.title}"
+                                    th:data-community-id="${communityId}"
+                                    th:attr="data-task-id=${task.id}, data-task-title=${task.title}, data-community-id=${communityId}">
+                                <i class="far fa-eye me-1"></i> View Responses
+                            </button>
+                            <button type="button" 
+                                    class="btn btn-sm btn-outline-danger delete-task-btn"
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#deleteTaskModal"
+                                    th:attr="data-task-id=${task.id}, data-task-title=${task.title}">
+                                <i class="far fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Responses Modal -->
+    <div class="modal fade" id="taskResponsesModal" tabindex="-1" aria-labelledby="taskResponsesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="taskResponsesModalLabel">Responses for Task</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="responsesList">
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2 mb-0">Loading responses...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Task Confirmation Modal -->
+    <div class="modal fade" id="deleteTaskModal" tabindex="-1" aria-labelledby="deleteTaskModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteTaskModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete the task "<span id="taskTitleToDelete"></span>"?</p>
+                    <p class="text-danger"><small>This action cannot be undone.</small></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form id="deleteTaskForm" method="POST" th:action="@{/user/community/{communityId}/task-buddy/delete(communityId=${communityId})}">
+                        <input type="hidden" name="taskId" id="deleteTaskId" value="" />
+                        <button type="submit" class="btn btn-danger">Delete Task</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Info Modal -->
+    <div class="modal fade" id="contactInfoModal" tabindex="-1" aria-labelledby="contactInfoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="contactInfoModalLabel">Contact Information</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-user-circle fa-4x text-primary mb-3"></i>
+                        <h4 id="requestorName"></h4>
+                    </div>
+                    <div class="contact-info">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-phone-alt me-3 text-primary"></i>
+                            <div>
+                                <p class="mb-0 text-muted">Phone Number</p>
+                                <p id="requestorPhone" class="mb-0 fw-bold"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+            <div class="toast-header bg-success text-white">
+                <strong class="me-auto">Success</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div id="successToastBody" class="toast-body">
+                Operation completed successfully!
+            </div>
+        </div>
+        
+        <!-- Error Toast -->
+        <div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+            <div class="toast-header bg-danger text-white">
+                <strong class="me-auto">Error</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div id="errorToastBody" class="toast-body">
+                An error occurred. Please try again.
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Bootstrap tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Handle Task Responses Modal
+            const taskResponsesModal = document.getElementById('taskResponsesModal');
+            if (taskResponsesModal) {
+                taskResponsesModal.addEventListener('show.bs.modal', function(event) {
+                    const button = event.relatedTarget;
+                    const taskId = button.getAttribute('data-task-id');
+                    const taskTitle = button.getAttribute('data-task-title');
+                    const communityId = button.getAttribute('data-community-id');
+                    const modalTitle = taskResponsesModal.querySelector('.modal-title');
+                    const responsesList = document.getElementById('responsesList');
+
+                    modalTitle.textContent = `Responses for: ${taskTitle}`;
+
+                    // Show loading state
+                    responsesList.innerHTML = `
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2 mb-0">Loading responses...</p>
+                        </div>`;
+
+                    // Fetch offers
+                    console.log('Fetching responses for task ID:', taskId);
+                    fetch(`/user/api/tasks/${taskId}/responses`)
+                        .then(response => {
+                            console.log('Response status:', response.status);
+                            if (!response.ok) {
+                                console.error('Failed to fetch responses:', response.statusText);
+                                throw new Error('Failed to fetch responses');
+                            }
+                            return response.json().then(data => {
+                                console.log('Received offers:', data);
+                                return data;
+                            });
+                        })
+                        .then(offers => {
+                            if (offers.length > 0) {
+                                responsesList.innerHTML = offers.map(offer => `
+                                    <div class="card mb-2">
+                                        <div class="card-body">
+                                            <h6 class="card-title">${offer.user.fullName || 'Anonymous User'}</h6>
+                                            <p class="card-text">${offer.message || 'No message provided'}</p>
+                                            <p class="text-muted small">Offered on: ${new Date(offer.createdAt).toLocaleString()}</p>
+                                            ${offer.status === 'accepted' ? 
+                                                `<div class="d-flex align-items-center">
+                                                    <span class="badge bg-success me-2">
+                                                        <i class="fas fa-check-circle me-1"></i> Accepted
+                                                    </span>
+                                                    ${!offer.taskCompleted ? 
+                                                        `<button class="btn btn-sm btn-success" 
+                                                                onclick="markTaskAsCompleted(${communityId}, ${taskId}, ${offer.id}, this)">
+                                                            <i class="fas fa-check-double me-1"></i> Mark as Completed
+                                                        </button>` : 
+                                                        `<span class="badge bg-success">
+                                                            <i class="fas fa-check-double me-1"></i> Completed
+                                                        </span>`
+                                                    }
+                                                </div>` :
+                                                offer.status === 'rejected' ? 
+                                                '<span class="badge bg-danger">\n                                                    <i class="fas fa-times-circle me-1"></i> Rejected\n                                                </span>' :
+                                                `<button class="btn btn-primary btn-sm" 
+                                                        onclick="acceptOffer(${communityId}, ${taskId}, ${offer.id}, this)">
+                                                    <i class="fas fa-check me-1"></i> Accept Offer
+                                                </button>`}
+                                        </div>
+                                    </div>
+                                `).join('');
+                            } else {
+                                responsesList.innerHTML = '<p class="text-center py-3">No responses yet.</p>';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error fetching responses:', error);
+                            responsesList.innerHTML = '<p class="text-danger text-center">Error loading responses. Please try again.</p>';
+                        });
+                });
+            }
+
+            // Function to accept an offer
+            window.acceptOffer = function(communityId, taskId, offerId, button) {
+                if (confirm('Are you sure you want to accept this offer?')) {
+                    fetch(`/user/community/${communityId}/task-buddy/accept-offer`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `taskId=${taskId}&offerId=${offerId}`
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            // Update the UI without reloading the page
+                            const card = button.closest('.card-body');
+                            if (card) {
+                                const statusHtml = `
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge bg-success me-2">
+                                            <i class="fas fa-check-circle me-1"></i> Accepted
+                                        </span>
+                                        <button class="btn btn-sm btn-success" 
+                                                onclick="markTaskAsCompleted(${communityId}, ${taskId}, ${offerId}, this)">
+                                            <i class="fas fa-check-double me-1"></i> Mark as Completed
+                                        </button>
+                                    </div>`;
+                                
+                                // Replace the accept button with the new status
+                                button.outerHTML = statusHtml;
+                            }
+                        } else {
+                            throw new Error('Failed to accept offer');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error accepting offer:', error);
+                        alert('Error accepting offer. Please try again.');
+                    });
+                }
+            };
+
+            // Function to mark a task as completed
+            window.markTaskAsCompleted = function(communityId, taskId, offerId, button) {
+                if (confirm('Are you sure you want to mark this task as completed?')) {
+                    // Show loading state
+                    const originalButton = button.innerHTML;
+                    button.disabled = true;
+                    button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Completing...';
+                    
+                    fetch(`/user/community/${communityId}/task-buddy/complete-task`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `taskId=${taskId}&offerId=${offerId}`
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(err => {
+                                throw new Error(err.error || 'Failed to mark task as completed');
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            // Update the button to show completed status
+                            button.outerHTML = `
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check-double me-1"></i> Completed
+                                </span>`;
+                            
+                            // Show success toast
+                            const toast = new bootstrap.Toast(document.getElementById('successToast'));
+                            const toastBody = document.getElementById('successToastBody');
+                            toastBody.textContent = 'Task marked as completed successfully!';
+                            toast.show();
+                            
+                            // Close the modal after a short delay
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('taskResponsesModal'));
+                            if (modal) {
+                                setTimeout(() => {
+                                    modal.hide();
+                                    // Reload the page to reflect changes everywhere
+                                    location.reload();
+                                }, 1500);
+                            } else {
+                                // If modal is not available, just reload
+                                setTimeout(() => location.reload(), 1500);
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error completing task:', error);
+                        // Show error toast
+                        const toast = new bootstrap.Toast(document.getElementById('errorToast'));
+                        const toastBody = document.getElementById('errorToastBody');
+                        toastBody.textContent = error.message || 'Error marking task as completed. Please try again.';
+                        toast.show();
+                        // Reset button
+                        button.disabled = false;
+                        button.innerHTML = originalButton;
+                    });
+                }
+            };
+
+            // Handle delete task modal
+            document.querySelectorAll('.delete-task-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const taskId = this.getAttribute('data-task-id');
+                    const taskTitle = this.getAttribute('data-task-title');
+                    
+                    // Update the modal title and task title
+                    const modalTitle = document.querySelector('#deleteTaskModal .modal-title');
+                    const taskTitleElement = document.getElementById('taskTitleToDelete');
+                    const taskIdInput = document.getElementById('deleteTaskId');
+                    
+                    if (modalTitle) {
+                        modalTitle.textContent = 'Delete Task';
+                    }
+                    
+                    if (taskTitleElement) {
+                        taskTitleElement.textContent = taskTitle;
+                    }
+                    
+                    // Update the task ID in the form
+                    if (taskIdInput) {
+                        taskIdInput.value = taskId;
+                    }
+                });
+            });
+
+            // Handle offer help button click
+            document.querySelectorAll('.offer-help-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const taskId = this.getAttribute('data-task-id');
+                    fetchRequestorInfo(taskId);
+                });
+            });
+
+            // Function to fetch requestor information
+            function fetchRequestorInfo(taskId) {
+                fetch('/api/tasks/' + taskId + '/requestor-info')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch requestor information');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        showContactInfo(data);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Failed to load contact information. Please try again.');
+                    });
+            }
+
+            // Function to show contact information in modal
+            function showContactInfo(data) {
+                const nameElement = document.getElementById('requestorName');
+                const phoneElement = document.getElementById('requestorPhone');
+                const contactModal = new bootstrap.Modal(document.getElementById('contactInfoModal'));
+
+                if (nameElement && phoneElement) {
+                    nameElement.textContent = data.name || 'Name not available';
+                    phoneElement.textContent = data.phoneNumber || 'Phone number not available';
+                    contactModal.show();
+                }
+            }
+        });
+        /*]]>*/
+    </script>
+</body>
+</html>

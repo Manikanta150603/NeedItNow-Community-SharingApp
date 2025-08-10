@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="html">
+<head lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+<meta    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Offers - TaskBuddy</title>
+    <!-- Bootstrap 5.3.0 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome 6.4.0 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Roboto -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Base Reset and Font */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+    background: #000;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+    color: #fff;
+}
+
+/* Hide scrollbar but keep functionality */
+body {
+    scrollbar-width: none;  /* For Firefox */
+    -ms-overflow-style: none;  /* For Internet Explorer and Edge */
+}
+
+/* For Chrome, Safari, and Opera */
+body::-webkit-scrollbar {
+    display: none;
+}
+
+/* Ensure the page still takes full height and can scroll */
+html, body {
+    height: 100%;
+    overflow: auto;
+}
+
+/* Background effects */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, 
+        rgba(139, 69, 195, 0.8) 0%,
+        rgba(88, 28, 135, 0.9) 25%,
+        rgba(59, 7, 100, 0.95) 50%,
+        rgba(30, 0, 50, 0.98) 75%,
+        #000 100%);
+    z-index: -3;
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    opacity: 0.03;
+    mix-blend-mode: soft-light;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    z-index: -2;
+}
+
+/* Animated background glows */
+.glow-top {
+    position: fixed;
+    top: -20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120vh;
+    height: 80vh;
+    border-radius: 0 0 50% 50%;
+    background: radial-gradient(ellipse at center, 
+        rgba(168, 85, 247, 0.4) 0%,
+        rgba(139, 69, 195, 0.3) 30%,
+        rgba(88, 28, 135, 0.2) 60%,
+        transparent 100%);
+    filter: blur(60px);
+    z-index: -1;
+    animation: pulse-glow 8s ease-in-out infinite alternate;
+}
+
+.glow-middle {
+    position: fixed;
+    top: 20%;
+    right: -10%;
+    width: 60vh;
+    height: 60vh;
+    border-radius: 50%;
+    background: radial-gradient(circle, 
+        rgba(147, 51, 234, 0.3) 0%,
+        rgba(88, 28, 135, 0.2) 50%,
+        transparent 100%);
+    filter: blur(80px);
+    animation: pulse-middle 6s ease-in-out 2s infinite alternate;
+    z-index: -1;
+}
+
+.glow-bottom {
+    position: fixed;
+    bottom: -20%;
+    left: -10%;
+    width: 80vh;
+    height: 80vh;
+    border-radius: 50%;
+    background: radial-gradient(circle, 
+        rgba(126, 34, 206, 0.3) 0%,
+        rgba(79, 70, 229, 0.2) 40%,
+        transparent 100%);
+    filter: blur(100px);
+    animation: pulse-bottom 10s ease-in-out 1s infinite alternate;
+    z-index: -1;
+}
+
+@keyframes pulse-glow {
+    0% { opacity: 0.3; }
+    100% { opacity: 0.6; }
+}
+
+@keyframes pulse-middle {
+    0% { opacity: 0.2; transform: scale(0.8); }
+    100% { opacity: 0.4; transform: scale(1.2); }
+}
+
+@keyframes pulse-bottom {
+    0% { opacity: 0.2; transform: scale(0.9); }
+    100% { opacity: 0.4; transform: scale(1.1); }
+}
+
+/* Dashboard Header */
+.dashboard-header {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 2rem 0;
+    position: relative;
+    z-index: 10;
+}
+
+.dashboard-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.dashboard-header .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    position: relative;
+    z-index: 1;
+}
+
+.dashboard-header h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin: 1rem 0 0.5rem 0;
+    background: linear-gradient(135deg, #fff 0%, rgba(168, 85, 247, 0.8) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: slide-up 0.8s ease 0.2s forwards;
+    opacity: 0;
+}
+
+.dashboard-header p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.1rem;
+    animation: slide-up 0.8s ease 0.3s forwards;
+    opacity: 0;
+}
+
+/* Back Button */
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.5rem;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    margin-bottom: 1.5rem;
+    animation: slide-up 0.8s ease 0.1s forwards;
+    opacity: 0;
+}
+
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    color: #fff;
+    text-decoration: none;
+}
+
+.back-btn:active {
+    transform: translateY(0);
+}
+
+/* Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+/* Filter Bar */
+.filter-bar {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    animation: slide-up 0.8s ease 0.4s forwards;
+    opacity: 0;
+}
+
+/* Task Cards */
+.task-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    animation: slide-up 0.8s ease forwards;
+}
+
+.task-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.task-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 10px 30px rgba(168, 85, 247, 0.2);
+}
+
+.task-card:hover::before {
+    opacity: 1;
+}
+
+.task-card h5 {
+    color: #fff;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    font-size: 1.3rem;
+}
+
+.task-card p {
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+/* Empty State */
+.taskbuddy-my-request-empty {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    margin: 2rem 0;
+    animation: slide-up 0.8s ease forwards;
+}
+
+.taskbuddy-my-request-empty h4 {
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+.taskbuddy-my-request-empty p {
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 1.5rem;
+}
+
+/* Form Elements */
+.form-select {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    color: #fff;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-select:focus {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(34, 197, 94, 0.5);
+    box-shadow: 0 0 0 0.2rem rgba(34, 197, 94, 0.25);
+    color: #fff;
+}
+
+.form-select option {
+    background: #1a1a1a;
+    color: #fff;
+}
+
+/* Buttons */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    text-decoration: none;
+    border: none;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: #fff;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    color: #fff;
+    text-decoration: none;
+}
+
+.btn-outline-danger {
+    background: transparent;
+    color: #dc2626;
+    border: 1px solid #dc2626;
+}
+
+.btn-outline-danger:hover {
+    background: #dc2626;
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+}
+
+.btn-outline-primary {
+    background: transparent;
+    color: #3b82f6;
+    border: 1px solid #3b82f6;
+}
+
+.btn-outline-primary:hover {
+    background: #3b82f6;
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    color: #fff;
+    border: none;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #b91c1c, #991b1b);
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+    color: #fff;
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    transform: translateY(-1px);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #fff;
+    border: none;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #16a34a, #15803d);
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+    color: #fff;
+}
+
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+}
+
+/* Modal Styles */
+.modal.fade {
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+}
+
+.modal-content {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    color: #fff;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5), 0 0 40px rgba(34, 197, 94, 0.2);
+    position: relative;
+    animation: slideUp 0.3s ease forwards;
+}
+
+.modal-content::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.03;
+    background-image: linear-gradient(135deg, #fff 0.5px, transparent 0.5px), linear-gradient(45deg, #fff 0.5px, transparent 0.5px);
+    background-size: 30px 30px;
+    border-radius: 1rem;
+    pointer-events: none;
+}
+
+.modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem 1rem 0 0;
+    position: relative;
+}
+
+.modal-title {
+    color: #fff;
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    padding: 1.25rem 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 0 0 1rem 1rem;
+}
+
+.btn-close {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 50% !important;
+    width: 28px !important;
+    height: 28px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    opacity: 0.8 !important;
+    transition: all 0.3s ease !important;
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    filter: none !important;
+    background-image: none !important;
+}
+
+.btn-close::before {
+    content: '×' !important;
+    color: #ff6b6b !important;
+    font-size: 24px !important;
+    line-height: 1 !important;
+    position: relative !important;
+    top: -1px !important;
+}
+
+.btn-close:hover {
+    background: rgba(220, 38, 38, 0.4) !important;
+    border-color: rgba(220, 38, 38, 0.6) !important;
+    transform: rotate(90deg) scale(1.1) !important;
+    opacity: 1 !important;
+}
+
+/* Toast Styles */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1055;
+}
+
+.toast {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    color: #fff;
+    margin-bottom: 0.5rem;
+}
+
+.toast-header {
+    background: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.75rem 1rem;
+}
+
+.toast-body {
+    padding: 1rem;
+}
+
+/* Text Colors */
+.text-muted {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Grid System */
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -0.75rem;
+}
+
+.col-12 {
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding: 0 0.75rem;
+}
+
+.col-md-3 {
+    flex: 0 0 25%;
+    max-width: 25%;
+    padding: 0 0.75rem;
+}
+
+.col-md-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+    padding: 0 0.75rem;
+}
+
+.g-3 > * {
+    margin-bottom: 1rem;
+}
+
+/* Utilities */
+.d-flex {
+    display: flex;
+}
+
+.gap-2 {
+    gap: 0.5rem;
+}
+
+.mt-3 {
+    margin-top: 1rem;
+}
+
+.mt-4 {
+    margin-top: 1.5rem;
+}
+
+.mb-0 {
+    margin-bottom: 0;
+}
+
+.me-1 {
+    margin-right: 0.25rem;
+}
+
+.me-2 {
+    margin-right: 0.5rem;
+}
+
+.d-inline {
+    display: inline;
+}
+
+.small {
+    font-size: 0.875rem;
+}
+
+/* Animations */
+@keyframes slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from { 
+        opacity: 0; 
+        transform: translateY(20px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .col-md-3,
+    .col-md-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    
+    .dashboard-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .task-card {
+        padding: 1rem;
+    }
+    
+    .modal-dialog {
+        margin: 1rem;
+        max-width: calc(100% - 2rem);
+    }
+    
+    .filter-bar {
+        padding: 1rem;
+    }
+}
+    </style>
+</head>
+<body>
+     
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="container">
+            <a th:href="@{/user/community/{id}/task-buddy(id=${communityId})}" class="back-btn">
+                <i class="fas fa-arrow-left me-2"></i> Back to TaskBuddy
+            </a>
+            <h1>
+                <i class="fas fa-hands-helping"></i> My Offers
+            </h1>
+            <p class="mb-0">Manage and track all your task offers and responses.</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <form th:action="@{/user/community/{id}/taskbuddy/my-offers(id=${communityId})}" method="get" class="row g-3">
+                <div class="col-md-3">
+                    <select name="status" class="form-select" onchange="this.form.submit()">
+                        <option value="">All Statuses</option>
+                        <option th:value="'pending'" th:selected="${param.status == 'pending'}">Pending</option>
+                        <option th:value="'accepted'" th:selected="${param.status == 'accepted'}">Accepted</option>
+                        <option th:value="'completed'" th:selected="${param.status == 'completed'}">Completed</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="category" class="form-select" onchange="this.form.submit()">
+                        <option value="">All Categories</option>
+                        <option th:each="cat, iter : ${categories}"
+                                th:value="${cat}"
+                                th:text="${categoryDisplayNames[iter.index]}"
+                                th:selected="${param.category == cat}"></option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="sort" class="form-select" onchange="this.form.submit()">
+                        <option value="newest" th:selected="${param.sort == 'newest'}">Newest First</option>
+                        <option value="oldest" th:selected="${param.sort == 'oldest'}">Oldest First</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+
+        <!-- Task Offers List -->
+        <div th:if="${myOffers != null and not #lists.isEmpty(myOffers)}">
+            <div th:each="offer : ${myOffers}" class="task-card">
+                <div class="row">
+                    <th:block th:if="${offer.task != null}">
+                        <div class="col-12">
+                            <h5 th:text="${offer.task?.title ?: 'No title'}"></h5>
+                            <p class="text-muted" th:if="${offer.task?.creator?.fullName != null}">
+                                Requester: <span th:text="${offer.task?.creator.fullName ?: 'Unknown'}"></span>
+                            </p>
+                            <p th:if="${offer.task?.description != null}" 
+                               th:text="${#strings.abbreviate(offer.task?.description, 100)}"></p>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p th:if="${offer.task?.dueDate != null}">
+                                        <strong>Due Date:</strong> 
+                                        <span th:text="${#temporals.format(offer.task?.dueDate, 'MMM dd, yyyy')}"></span>
+                                    </p>
+                                    <p th:if="${offer.task?.timeNeeded != null}">
+                                        <strong>Time Needed:</strong> 
+                                        <span th:text="${offer.task?.timeNeeded}"></span>
+                                    </p>
+                                    <p th:if="${offer.task?.estimatedDuration != null}">
+                                        <strong>Duration:</strong> 
+                                        <span th:text="${offer.task?.estimatedDuration}"></span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Reward:</strong> 
+                                       <span th:text="${offer.task?.hasReward ? offer.task?.reward : 'Gratitude only'}"></span>
+                                    </p>
+                                    <p><strong>Location:</strong> 
+                                       <span th:text="${offer.task?.location != null ? offer.task?.location : 'Not specified'}"></span>
+                                    </p>
+
+                                </div>
+                            </div>
+                            <!-- Action Buttons -->
+                            <div class="d-flex gap-2 mt-3">
+                                <!-- Cancel Button -->
+                                <button class="btn btn-outline-danger btn-sm"
+                                        data-bs-toggle="modal"
+                                        th:data-bs-target="'#cancelOfferModal' + ${offer.id}">
+                                    <i class="fas fa-times me-1"></i> Cancel
+                                </button>
+                                
+                                <!-- Contact Button -->
+                                <button class="btn btn-outline-primary btn-sm"
+                                        th:attr="data-user-id=${offer.task?.creator?.id}"
+                                        onclick="fetchContactInfo(this)">
+                                    <i class="fas fa-phone me-1"></i> Contact
+                                </button>
+                                
+
+                            </div>
+                            
+                            <!-- Cancel Offer Modal -->
+                            <div class="modal fade" th:id="'cancelOfferModal' + ${offer.id}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Cancel Offer</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Are you sure you want to cancel your offer for this task?</p>
+                                            <p class="text-muted small">This action cannot be undone.</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            <form th:action="@{/user/community/{communityId}/task-buddy/cancel-offer(communityId=${communityId})}" method="post" class="d-inline">
+                                                <input type="hidden" name="offerId" th:value="${offer.id}" />
+                                                <button type="submit" class="btn btn-danger">
+                                                    <i class="fas fa-times me-1"></i> Cancel Offer
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </th:block>
+                </div>
+
+                <!-- Cancel Offer Modal -->
+                <div class="modal fade" th:id="'cancelOfferModal' + ${offer.id}" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Cancel Offer</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Are you sure you want to cancel your offer for "<span th:text="${offer.task.title}"></span>"?</p>
+                            </div>
+                            <div class="modal-footer">
+                                <form th:action="@{/user/community/{id}/task-buddy/cancel-offer(id=${communityId})}" method="post">
+                                    <input type="hidden" name="offerId" th:value="${offer.id}">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-danger">Cancel Offer</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mark Helped Modal -->
+                <div class="modal fade" th:id="'markHelpedModal' + ${offer.id}" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Mark Task as Helped</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Mark "<span th:text="${offer.task.title}"></span>" as completed?</p>
+                            </div>
+                            <div class="modal-footer">
+                                <form th:action="@{/user/community/{id}/task-buddy/mark-helped(id=${communityId})}" method="post">
+                                    <input type="hidden" name="taskId" th:value="${offer.task.id}">
+                                    <input type="hidden" name="offerId" th:value="${offer.id}">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-success">Mark Helped</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- No Offers Yet -->
+        <div>
+            <div class="taskbuddy-my-request-empty text-center" th:if="${myOffers == null or #lists.isEmpty(myOffers)}">
+                <h4>No tasks found</h4>
+                <p>You haven't offered to help with any tasks yet.</p>
+                <a th:href="@{/user/community/{id}/taskbuddy/browse-tasks(id=${communityId})}" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Browse Tasks
+                </a>
+            </div>
+        </div>
+
+        <!-- Contact Info Modal -->
+        <div class="modal fade" id="contactModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Contact Information</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p><strong>Name:</strong> <span id="contactName"></span></p>
+                        <p><strong>Phone:</strong> <a id="contactPhone" href="#"></a></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Container -->
+        <div class="toast-container">
+            <div id="successToast" class="toast" role="alert">
+                <div class="toast-header">
+                    <strong class="alert-success">Success</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+                </div>
+                <div class="toast-body"></div>
+            </div>
+            <div id="errorToast" class="toast" role="alert">
+                <div class="toast-header">
+                    <strong class="alert-danger">Error</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+                </div>
+                <div class="toast-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Fetch contact info via AJAX
+        async function fetchContactInfo(button) {
+            const userId = button.getAttribute('data-user-id');
+            try {
+                const response = await fetch(`/user/api/users/${userId}/contact-info`);
+                const data = await response.json();
+                document.getElementById('contactName').textContent = data.name;
+                const phoneLink = document.getElementById('contactPhone');
+                phoneLink.textContent = data.phone;
+                phoneLink.href = `tel:${data.phone}`;
+                const modal = new bootstrap.Modal(document.getElementById('contactModal'));
+                modal.show();
+            } catch (error) {
+                showErrorToast('Failed to fetch contact information');
+            }
+        }
+
+        // Show success/error toasts
+        function showSuccessToast(message) {
+            const toast = document.getElementById('successToast');
+            toast.querySelector('.toast-body').textContent = message;
+            new bootstrap.Toast(toast).show();
+        }
+
+        function showErrorToast(message) {
+            const toast = document.getElementById('errorToast');
+            toast.querySelector('.toast-body').textContent = message;
+            new bootstrap.Toast(toast).show();
+        }
+
+        // Handle flash messages from redirect
+        const successMessage = /*[[${success}]]*/ '';
+        const errorMessage = /*[[${error}]]*/ '';
+        if (successMessage) showSuccessToast(successMessage);
+        if (errorMessage) showErrorToast(errorMessage);
+    </script>
+</body>
+</html>

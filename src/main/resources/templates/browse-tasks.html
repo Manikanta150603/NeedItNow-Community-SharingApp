@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>📃 Browse Task Requests</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+    background: #000;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+    color: #fff;
+}
+
+/* Hide scrollbar but keep functionality */
+body {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+body::-webkit-scrollbar {
+    display: none;
+}
+
+html, body {
+    height: 100%;
+    overflow: auto;
+}
+
+/* Background effects */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, 
+        rgba(139, 69, 195, 0.8) 0%,
+        rgba(88, 28, 135, 0.9) 25%,
+        rgba(59, 7, 100, 0.95) 50%,
+        rgba(30, 0, 50, 0.98) 75%,
+        #000 100%);
+    z-index: -3;
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    opacity: 0.03;
+    mix-blend-mode: soft-light;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    z-index: -2;
+}
+
+/* Animated background glows */
+.glow-top {
+    position: fixed;
+    top: -20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120vh;
+    height: 80vh;
+    border-radius: 0 0 50% 50%;
+    background: radial-gradient(ellipse at center, 
+        rgba(168, 85, 247, 0.4) 0%,
+        rgba(139, 69, 195, 0.3) 30%,
+        rgba(88, 28, 135, 0.2) 60%,
+        transparent 100%);
+    filter: blur(60px);
+    z-index: -1;
+    animation: pulse-glow 8s ease-in-out infinite alternate;
+}
+
+.glow-middle {
+    position: fixed;
+    top: 20%;
+    right: -10%;
+    width: 60vh;
+    height: 60vh;
+    border-radius: 50%;
+    background: radial-gradient(circle, 
+        rgba(147, 51, 234, 0.3) 0%,
+        rgba(88, 28, 135, 0.2) 50%,
+        transparent 100%);
+    filter: blur(80px);
+    animation: pulse-middle 6s ease-in-out 2s infinite alternate;
+    z-index: -1;
+}
+
+.glow-bottom {
+    position: fixed;
+    bottom: -20%;
+    left: -10%;
+    width: 80vh;
+    height: 80vh;
+    border-radius: 50%;
+    background: radial-gradient(circle, 
+        rgba(126, 34, 206, 0.3) 0%,
+        rgba(79, 70, 229, 0.2) 40%,
+        transparent 100%);
+    filter: blur(100px);
+    animation: pulse-bottom 10s ease-in-out 1s infinite alternate;
+    z-index: -1;
+}
+
+@keyframes pulse-glow {
+    0% { opacity: 0.4; transform: translateX(-50%) scale(1); }
+    100% { opacity: 0.6; transform: translateX(-50%) scale(1.1); }
+}
+
+@keyframes pulse-middle {
+    0% { opacity: 0.3; transform: scale(1); }
+    100% { opacity: 0.5; transform: scale(1.2); }
+}
+
+@keyframes pulse-bottom {
+    0% { opacity: 0.3; transform: scale(1); }
+    100% { opacity: 0.4; transform: scale(1.1); }
+}
+
+/* Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    position: relative;
+    z-index: 1;
+}
+
+/* Page Title */
+h2 {
+    color: #fff;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    background: linear-gradient(135deg, #fff 0%, rgba(255, 255, 255, 0.8) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: slide-up 0.8s ease forwards;
+}
+
+h2 i {
+    color: #a855f7;
+    margin-right: 0.5rem;
+}
+
+
+/* Dashboard Header */
+.dashboard-header {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 10;
+    animation: slide-down 0.8s ease forwards;
+    margin-bottom: 2rem;
+}
+
+.dashboard-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #fff 0%, rgba(255, 255, 255, 0.9) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.dashboard-header h1 i {
+    
+    font-size: 2.25rem;
+    background: rgba(147, 51, 234, 0.1);
+    width: 3rem;
+    height: 3rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 15px rgba(147, 51, 234, 0.2);
+}
+
+.dashboard-header p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.1rem;
+    margin-bottom: 0;
+    max-width: 600px;
+    line-height: 1.6;
+}
+
+/* Back Button */
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1.25rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.5rem;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    margin-bottom: 1.5rem;
+    animation: slide-up 0.8s ease 0.1s forwards;
+    opacity: 0;
+}
+
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    color: #fff;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.back-btn i {
+    margin-right: 0.5rem;
+    font-size: 0.9rem;
+    transition: transform 0.2s ease;
+}
+
+.back-btn:hover i {
+    transform: translateX(-2px);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .dashboard-header {
+        padding: 2rem 0;
+    }
+    
+    .dashboard-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .dashboard-header h1 i {
+        font-size: 1.8rem;
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+    
+    .dashboard-header p {
+        font-size: 1rem;
+    }
+    
+    .back-btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.9rem;
+    }
+}
+/* Filter Bar */
+.filter-bar {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+    animation: slide-up 0.8s ease 0.2s forwards;
+    opacity: 0;
+}
+
+.filter-bar::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.filter-bar:hover::before {
+    opacity: 1;
+}
+
+/* Form Elements */
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+}
+
+.form-control, .form-select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    outline: none;
+}
+
+.form-control:focus, .form-select:focus {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(168, 85, 247, 0.5);
+    box-shadow: 0 0 0 0.2rem rgba(168, 85, 247, 0.25);
+    color: #fff;
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.form-select option {
+    background: #1a1a1a;
+    color: #fff;
+}
+
+/* Form Check Elements */
+.form-check {
+    margin-bottom: 0.5rem;
+}
+
+.form-check-input {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    width: 1.2em;
+    height: 1.2em;
+    margin-top: 0.125em;
+    transition: all 0.3s ease;
+}
+
+.form-check-input:checked {
+    background-color: #a855f7;
+    border-color: #a855f7;
+}
+
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.2rem rgba(168, 85, 247, 0.25);
+    border-color: rgba(168, 85, 247, 0.5);
+}
+
+.form-check-label {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+    margin-left: 0.5rem;
+}
+
+.form-check-inline {
+    display: inline-block;
+    margin-right: 1rem;
+}
+
+/* Buttons */
+.btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    text-decoration: none;
+    border: none;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #a855f7, #7c3aed);
+    color: #fff;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(168, 85, 247, 0.4);
+    color: #fff;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+    border: none;
+}
+
+.btn-success::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
+    transform: translateX(-100%);
+    animation: button-shine 2s ease-in-out infinite;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #16a34a, #15803d);
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+    color: #fff;
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    transform: translateY(-1px);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.btn-sm {
+    padding: 8px 16px;
+    font-size: 12px;
+}
+
+@keyframes button-shine {
+    0% { transform: translateX(-100%); }
+    50% { transform: translateX(100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Alert Styles */
+.alert {
+    border-radius: 0.75rem;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    border: none;
+    backdrop-filter: blur(10px);
+    animation: slide-up 0.5s ease forwards;
+}
+
+.alert-info {
+    background: rgba(6, 182, 212, 0.1);
+    border: 1px solid rgba(6, 182, 212, 0.3);
+    color: #06b6d4;
+}
+
+/* Task Cards */
+.task-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    animation: slide-up 0.8s ease forwards;
+}
+
+.task-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.task-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 10px 30px rgba(168, 85, 247, 0.2);
+}
+
+.task-card:hover::before {
+    opacity: 1;
+}
+
+.task-card .card-body {
+    padding: 1.5rem;
+    background: transparent;
+    border: none;
+}
+
+.task-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #fff;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.card-text {
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+/* Badges */
+.badge {
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.badge.bg-primary {
+    background: linear-gradient(135deg, #a855f7, #7c3aed) !important;
+}
+
+.badge-category {
+    background: linear-gradient(135deg, #06b6d4, #0891b2) !important;
+    color: #fff;
+}
+
+.reward-badge {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+    color: #000;
+}
+
+.gratitude-badge {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #22c55e !important;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+/* Task Info Icons */
+.task-card .card-body > div:nth-child(3) {
+    margin-bottom: 1rem;
+}
+
+.task-card .card-body > div:nth-child(3) span {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.875rem;
+    display: inline-block;
+    margin-right: 1rem;
+}
+
+.task-card .card-body > div:nth-child(3) i {
+    color: #a855f7;
+    margin-right: 0.5rem;
+}
+
+/* Modal Styles */
+.modal.fade {
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+}
+
+.modal-content {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    color: #fff;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5), 0 0 40px rgba(168, 85, 247, 0.2);
+    position: relative;
+    animation: slideUp 0.3s ease forwards;
+}
+
+.modal-content::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.03;
+    background-image: linear-gradient(135deg, #fff 0.5px, transparent 0.5px), linear-gradient(45deg, #fff 0.5px, transparent 0.5px);
+    background-size: 30px 30px;
+    border-radius: 1rem;
+    pointer-events: none;
+}
+
+.modal-header {
+    padding: 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem 1rem 0 0;
+    position: relative;
+}
+
+.modal-title {
+    color: #fff;
+    font-weight: 600;
+    font-size: 20px;
+    background: linear-gradient(to bottom, #fff, rgba(255, 255, 255, 0.8));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.btn-close {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 50% !important;
+    width: 28px !important;
+    height: 28px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    opacity: 0.8 !important;
+    transition: all 0.3s ease !important;
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    filter: none !important;
+    background-image: none !important;
+}
+
+.btn-close::before {
+    content: '×' !important;
+    color: #ff6b6b !important;
+    font-size: 24px !important;
+    line-height: 1 !important;
+    position: relative !important;
+    top: -1px !important;
+}
+
+.btn-close:hover {
+    background: rgba(220, 38, 38, 0.4) !important;
+    border-color: rgba(220, 38, 38, 0.6) !important;
+    transform: rotate(90deg) scale(1.1) !important;
+    opacity: 1 !important;
+}
+
+.modal-body {
+    padding: 25px 24px;
+}
+
+.modal-footer {
+    padding: 20px 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 0 0 1rem 1rem;
+}
+
+/* Contact Info Styles */
+.contact-info {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-top: 1rem;
+}
+
+.contact-info .d-flex {
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.contact-info i {
+    color: #a855f7;
+    font-size: 1.2rem;
+}
+
+.contact-info .text-muted {
+    color: rgba(255, 255, 255, 0.6) !important;
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+}
+
+.contact-info .fw-bold {
+    color: #fff;
+    font-weight: 600;
+}
+
+/* Text Colors */
+.text-primary {
+    color: #a855f7 !important;
+}
+
+.text-muted {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Grid System */
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -0.75rem;
+}
+
+.col-md-2, .col-md-12 {
+    padding: 0 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.col-md-2 {
+    flex: 0 0 16.666667%;
+    max-width: 16.666667%;
+}
+
+.col-md-12 {
+    flex: 0 0 100%;
+    max-width: 100%;
+}
+
+.g-2 > * {
+    margin-bottom: 0.5rem;
+}
+
+.align-items-end {
+    align-items: flex-end;
+}
+
+.d-flex {
+    display: flex;
+}
+
+.justify-content-between {
+    justify-content: space-between;
+}
+
+.align-items-start {
+    align-items: flex-start;
+}
+
+.align-items-center {
+    align-items: center;
+}
+
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-3 { margin-bottom: 1rem; }
+.mb-4 { margin-bottom: 1.5rem; }
+.me-1 { margin-right: 0.25rem; }
+.me-2 { margin-right: 0.5rem; }
+.me-3 { margin-right: 1rem; }
+.w-100 { width: 100%; }
+.text-center { text-align: center; }
+.fw-bold { font-weight: 600; }
+
+/* Animations */
+@keyframes slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from { 
+        opacity: 0; 
+        transform: translateY(20px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .col-md-2 {
+        flex: 0 0 100%;
+        max-width: 100%;
+        margin-bottom: 1rem;
+    }
+    
+    .filter-bar {
+        padding: 1rem;
+    }
+    
+    .container {
+        padding: 1rem 0.5rem;
+    }
+    
+    .modal-dialog {
+        margin: 1rem;
+        max-width: calc(100% - 2rem);
+    }
+    
+    .modal-body {
+        padding: 20px;
+    }
+    
+    .task-card .card-body {
+        padding: 1rem;
+    }
+    
+    .task-card .card-body > div:nth-child(3) span {
+        display: block;
+        margin-bottom: 0.5rem;
+        margin-right: 0;
+    }
+}
+
+/* Add background glow elements */
+body {
+    position: relative;
+}
+
+/* Create glow elements with JavaScript or add them to HTML */
+.glow-top, .glow-middle, .glow-bottom {
+    position: fixed;
+    pointer-events: none;
+    z-index: -1;
+}
+    </style>
+</head>
+<body>
+
+<!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="container">
+            <a th:href="@{/user/community/{id}(id=${communityId})}" class="back-btn">
+                <i class="fas fa-arrow-left me-2"></i> Back to Community
+            </a>
+            <h1>
+                <i class="fas fa-clipboard-list"></i></i> Browse Tasks
+            </h1>
+            <p class="mb-0">Find and help with tasks in your community</p>
+        </div>
+    </div>
+    
+    
+<div class="container py-4">
+
+    <div class="filter-bar mb-4">
+        <form method="get" th:action="@{/user/community/{communityId}/task-buddy/browse-tasks(communityId=${communityId})}" class="row g-2 align-items-end">
+            <div class="col-md-2">
+                <label class="form-label">Category</label>
+                <select class="form-select" name="category">
+                    <option value="">All</option>
+                    <option th:each="cat,iter : ${categories}" th:value="${cat}" th:text="${categoryDisplayNames[iter.index]}"></option>
+                </select>
+            </div>
+
+    
+            <div class="col-md-2">
+                <label class="form-label">Priority</label>
+                <select class="form-select" name="priority">
+                    <option value="">All</option>
+                    <option th:each="p : ${priorities}" th:value="${p}" th:text="${#strings.capitalize(#strings.toLowerCase(p))}"></option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Duration (up to)</label>
+                <select class="form-select" name="duration" title="Show tasks that take this amount of time or less">
+                    <option value="">All</option>
+                    <option th:each="dur : ${durations}" th:value="${dur}" th:text="${dur}"></option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Reward</label>
+                <div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="reward" id="rewardAll" value="" checked>
+                        <label class="form-check-label" for="rewardAll">All</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="reward" id="rewardYes" value="true">
+                        <label class="form-check-label" for="rewardYes">With Reward</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="reward" id="rewardNo" value="false">
+                        <label class="form-check-label" for="rewardNo">No Reward</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">When</label><br>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="dueToday" value="true" id="dueTodayCheck">
+                    <label class="form-check-label" for="dueTodayCheck">Due Today</label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Location</label>
+                <input type="text" class="form-control" name="location" placeholder="Nearby/Area">
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary w-100" type="submit"><i class="fas fa-filter me-1"></i>Filter</button>
+            </div>
+        </form>
+    </div>
+    <div th:if="${#lists.isEmpty(browseTasks)}" class="alert alert-info text-center">No tasks found for the selected filters.</div>
+    <div class="row">
+        <div class="col-md-12">
+            <div th:each="task : ${browseTasks}" class="card task-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="task-title" th:text="${task.title}">Task Title</span>
+                        <div>
+                            <span class="badge bg-primary me-1" th:text="${task.priority}">Priority</span>
+                            <span class="badge badge-category" th:text="${task.category}">Category</span>
+                        </div>
+                    </div>
+                    <p class="card-text mb-2" th:text="${task.description}">Task description will appear here.</p>
+                    <div class="mb-2">
+                        <span class="me-3"><i class="far fa-calendar-alt"></i> <span th:text="${#temporals.format(task.dueDate, 'MMM dd, yyyy')}"></span></span>
+                        <span class="me-3"><i class="far fa-clock"></i> <span th:text="${task.timeNeeded}"></span></span>
+                        <span class="me-3"><i class="fas fa-map-marker-alt"></i> <span th:text="${task.location}"></span></span>
+                        <span class="me-3"><i class="fas fa-hourglass-half"></i> <span th:text="${task.estimatedDuration}">Duration</span></span>
+                    </div>
+                    <div class="mb-2">
+                        <span th:if="${task.hasReward and not #strings.isEmpty(task.reward)}" class="badge reward-badge"><i class="fas fa-rupee-sign"></i> <span th:text="${task.reward}"></span></span>
+                        <span th:if="${not task.hasReward or #strings.isEmpty(task.reward)}" class="badge gratitude-badge">No reward, just gratitude! 🙏</span>
+                    </div>
+                    <button class="btn btn-success btn-sm offer-help-btn" 
+                            th:data-task-id="${task.id}"
+                            th:data-requestor-id="${task.creator.id}">
+                        <i class="fas fa-hands-helping me-1"></i> Offer Help
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Contact Info Modal -->
+<div class="modal fade" id="contactInfoModal" tabindex="-1" aria-labelledby="contactInfoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="contactInfoModalLabel">Contact Information</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-4">
+                    <i class="fas fa-user-circle fa-4x text-primary mb-3"></i>
+                    <h4 id="requestorName"></h4>
+                </div>
+                <div class="contact-info">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-phone-alt me-3 text-primary"></i>
+                        <div>
+                            <p class="mb-0 text-muted">Phone Number</p>
+                            <p id="requestorPhone" class="mb-0 fw-bold"></p>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-envelope me-3 text-primary"></i>
+                        <div>
+                            <p class="mb-0 text-muted">Email</p>
+                            <p id="requestorEmail" class="mb-0 fw-bold"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" id="confirmHelpBtn">
+                    <i class="fas fa-check-circle me-1"></i> Confirm to Help
+                </button>
+            </div>
+            <input type="hidden" id="confirmTaskId" name="taskId">
+        </div>
+    </div>
+</div>
+<!-- Offer Help Modal -->
+<div class="modal fade" id="offerHelpModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Offer Help</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to offer help with this task?</p>
+                <form id="offerHelpForm" th:action="@{/user/community/{communityId}/task-buddy/offer-help(communityId=${communityId})}" method="POST">
+                    <input type="hidden" id="offerHelpTaskId" name="taskId">
+                    <div class="mb-3">
+                        <label for="offerMessage" class="form-label">Message (optional)</label>
+                        <textarea class="form-control" id="offerMessage" name="message" rows="3" placeholder="Introduce yourself and explain how you can help..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="offerHelpForm" class="btn btn-primary">Offer Help</button>
+            </div>
+        </div>
+    </div>
+</div>
+    <!-- Bootstrap and jQuery Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Add SweetAlert2 for better alerts -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+        // Global variables
+        let currentTaskId = null;
+        const currentCommunityId = window.location.pathname.split('/')[3]; // Extract communityId from URL
+        
+        // Initialize modal behavior for Offer Help button
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Bootstrap tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            // Handle contact info button click
+            document.querySelectorAll('.offer-help-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const taskId = this.getAttribute('data-task-id');
+                    const requestorId = this.getAttribute('data-requestor-id');
+                    currentTaskId = taskId; // Store the task ID
+                    fetchRequestorInfo(taskId, requestorId);
+                });
+            });
+            
+            // Handle Confirm to Help button click
+            document.getElementById('confirmHelpBtn').addEventListener('click', function() {
+                if (!currentTaskId) {
+                    console.error('No task ID found');
+                    return;
+                }
+                
+                // Show confirmation dialog
+                Swal.fire({
+                    title: 'Confirm Help',
+                    text: 'Are you sure you want to help with this task?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#198754',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, I\'ll help!',
+                    cancelButtonText: 'Cancel',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Show loading state
+                        const confirmBtn = document.getElementById('confirmHelpBtn');
+                        const originalText = confirmBtn.innerHTML;
+                        confirmBtn.disabled = true;
+                        confirmBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+                        
+                        // Create a form and submit it directly
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = `/user/community/${currentCommunityId}/task-buddy/offer-help`;
+                        
+                        const taskIdInput = document.createElement('input');
+                        taskIdInput.type = 'hidden';
+                        taskIdInput.name = 'taskId';
+                        taskIdInput.value = currentTaskId;
+                        
+                        form.appendChild(taskIdInput);
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                });
+            });
+
+            // Function to fetch requestor information
+            function fetchRequestorInfo(taskId, requestorId) {
+                fetch(`/user/api/users/${requestorId}/contact-info`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch requestor information');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        showContactInfo(data);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Failed to load contact information. Please try again.');
+                    });
+            }
+
+            // Function to show contact information in modal
+            function showContactInfo(data) {
+                const nameElement = document.getElementById('requestorName');
+                const phoneElement = document.getElementById('requestorPhone');
+                const emailElement = document.getElementById('requestorEmail');
+                const contactModal = new bootstrap.Modal(document.getElementById('contactInfoModal'));
+                const confirmTaskIdInput = document.getElementById('confirmTaskId');
+
+                if (nameElement && phoneElement && emailElement && confirmTaskIdInput) {
+                    nameElement.textContent = data.name || 'Name not available';
+                    phoneElement.textContent = data.phoneNumber || 'Phone number not available';
+                    emailElement.textContent = data.email || 'Email not available';
+                    confirmTaskIdInput.value = currentTaskId;
+                    contactModal.show();
+                }
+            }
+        });
+    </script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function getUrlParameter(name) {
+        name = name.replace(/[\[]/, '\[').replace(/[\]]/, '\]');
+        var regex = new RegExp('[\?&]' + name + '=([^&#]*)');
+        var results = regex.exec(window.location.search);
+        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    }
+    var offerStatus = getUrlParameter('offerStatus');
+    if (offerStatus) {
+        if (offerStatus === 'success') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Thank you!',
+                text: 'Your offer to help has been submitted successfully.',
+                confirmButtonColor: '#198754'
+            });
+        } else if (offerStatus === 'already_offered') {
+            Swal.fire({
+                icon: 'info',
+                title: 'Already Offered',
+                text: 'You have already offered help for this task.',
+                confirmButtonColor: '#0d6efd'
+            });
+        } else if (offerStatus === 'self_offer') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Cannot Offer Help',
+                text: 'You cannot offer help on your own task.',
+                confirmButtonColor: '#ffc107'
+            });
+        }
+        // Remove the parameter from the URL after showing the message
+        if (window.history.replaceState) {
+            const url = new URL(window.location);
+            url.searchParams.delete('offerStatus');
+            window.history.replaceState({}, document.title, url.pathname + url.search);
+        }
+    }
+});
+</script>
+</body>
+</html>

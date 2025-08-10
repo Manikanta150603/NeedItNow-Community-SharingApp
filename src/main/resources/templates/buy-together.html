@@ -1,0 +1,2154 @@
+
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buy Together - NeedItNow</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+ /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: #000;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        body::-webkit-scrollbar {
+            display: none;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: auto;
+        }
+
+        /* Background effects */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(168, 85, 247, 0.4), rgba(147, 51, 234, 0.5), #000);
+            z-index: -3;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            opacity: 0.03;
+            mix-blend-mode: soft-light;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            background-size: 200px 200px;
+            z-index: -2;
+        }
+
+        .glow-top {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120vh;
+            height: 60vh;
+            border-radius: 0 0 50% 50%;
+            background: rgba(192, 132, 252, 0.2);
+            filter: blur(80px);
+            z-index: -1;
+        }
+
+        .glow-middle {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100vh;
+            height: 60vh;
+            border-radius: 0 0 100% 100%;
+            background: rgba(216, 180, 254, 0.2);
+            filter: blur(60px);
+            animation: pulse-middle 8s ease-in-out infinite alternate;
+            z-index: -1;
+        }
+
+        .glow-bottom {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90vh;
+            height: 90vh;
+            border-radius: 100% 100% 0 0;
+            background: rgba(192, 132, 252, 0.2);
+            filter: blur(60px);
+            animation: pulse-bottom 6s ease-in-out 1s infinite alternate;
+            z-index: -1;
+        }
+
+        .glow-spot-1, .glow-spot-2 {
+            position: fixed;
+            width: 24rem;
+            height: 24rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.4;
+            animation: pulse-spot 3s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        .glow-spot-1 {
+            left: 25%;
+            top: 25%;
+        }
+
+        .glow-spot-2 {
+            right: 25%;
+            bottom: 25%;
+            animation-delay: 1s;
+        }
+        
+        
+        /* Add this around line 10 in your <style> section */
+.table {
+    --bs-table-bg: rgba(255, 255, 255, 0.05);
+    --bs-table-striped-bg: rgba(255, 255, 255, 0.02);
+    --bs-table-hover-bg: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.table thead th {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-bottom-width: 1px;
+    color: #fff;
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+}
+
+.table-hover > tbody > tr:hover {
+    --bs-table-accent-bg: rgba(255, 255, 255, 0.1);
+}
+
+.table-bordered {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.table-bordered th,
+.table-bordered td {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Custom styles for status badges */
+.badge {
+    font-weight: 500;
+    padding: 0.35em 0.65em;
+}
+
+.bg-success {
+    background-color: rgba(25, 135, 84, 0.2) !important;
+    color: #75b798 !important;
+    border: 1px solid rgba(25, 135, 84, 0.3);
+}
+
+.bg-danger {
+    background-color: rgba(220, 53, 69, 0.2) !important;
+    color: #ea868f !important;
+    border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+/* Hover effects for table rows */
+.table-hover tbody tr {
+    transition: all 0.2s ease;
+}
+
+/* Button styling in table */
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    border-radius: 0.25rem;
+}
+
+/* Make table responsive */
+.table-responsive {
+    border-radius: 0.5rem;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+        /* Dashboard Header */
+        .dashboard-header {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .dashboard-header::before {
+            content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+        }
+
+        .dashboard-header .container {
+            position: relative;
+            z-index: 2;
+        }
+
+        .back-btn {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .dashboard-header h1 {
+            background: linear-gradient(to bottom, #fff, rgba(255, 255, 255, 0.8));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: bold;
+        }
+
+        .dashboard-header p {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Container */
+        .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Option Cards */
+        .option-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-decoration: none;
+            color: #fff;
+            display: block;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .option-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .option-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.3);
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .option-card:hover::before {
+            opacity: 1;
+        }
+
+        .option-icon {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .option-title {
+            color: #fff;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .option-desc {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.875rem;
+            margin-bottom: 0;
+        }
+
+        /* Info Card */
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), transparent);
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .card h4 {
+            color: #fff;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .card h5 {
+            color: #fff;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .card p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 0.5rem;
+        }
+
+        .text-muted {
+            color: rgba(255, 255, 255, 0.6) !important;
+        }
+
+        .text-success {
+            color: #22c55e !important;
+        }
+
+        .text-warning {
+            color: #f59e0b !important;
+        }
+
+        .text-primary {
+            color: #3b82f6 !important;
+        }
+
+        .text-info {
+            color: #06b6d4 !important;
+        }
+
+        /* Modal Styles */
+        .modal.fade {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            color: #fff;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5), 0 0 40px rgba(34, 197, 94, 0.2);
+            position: relative;
+            animation: slideUp 0.3s ease forwards;
+        }
+
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            opacity: 0.03;
+            background-image: linear-gradient(135deg, #fff 0.5px, transparent 0.5px), linear-gradient(45deg, #fff 0.5px, transparent 0.5px);
+            background-size: 30px 30px;
+            border-radius: 1rem;
+            pointer-events: none;
+        }
+
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem 1rem 0 0;
+            position: relative;
+        }
+
+        .modal-header.bg-primary {
+            background: rgba(59, 130, 246, 0.3) !important;
+        }
+
+        .modal-title {
+            color: #fff;
+            font-weight: 600;
+            font-size: 20px;
+            background: linear-gradient(to bottom, #fff, rgba(255, 255, 255, 0.8));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .btn-close, .btn-close-white {
+            background: rgba(255, 255, 255, 0.1) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            border-radius: 50% !important;
+            width: 28px !important;
+            height: 28px !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            opacity: 0.8 !important;
+            transition: all 0.3s ease !important;
+            position: relative !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            filter: none !important;
+            background-image: none !important;
+        }
+
+        .btn-close::before, .btn-close-white::before {
+            content: '×' !important;
+            color: #ff6b6b !important;
+            font-size: 24px !important;
+            line-height: 1 !important;
+            position: relative !important;
+            top: -1px !important;
+        }
+
+        .btn-close:hover, .btn-close-white:hover {
+            background: rgba(220, 38, 38, 0.4) !important;
+            border-color: rgba(220, 38, 38, 0.6) !important;
+            transform: rotate(90deg) scale(1.1) !important;
+            opacity: 1 !important;
+        }
+
+        .modal-body {
+            padding: 25px 24px;
+        }
+
+        .modal-footer {
+            padding: 20px 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 0 0 1rem 1rem;
+        }
+
+        /* Form Elements */
+        .form-control {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(34, 197, 94, 0.5);
+            box-shadow: 0 0 0 0.2rem rgba(34, 197, 94, 0.25);
+            color: #fff;
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .input-group-text {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            text-decoration: none;
+            border: none;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            transform: translateY(-1px);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-success {
+            background: #22c55e;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-success::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
+            transform: translateX(-100%);
+            animation: button-shine 2s ease-in-out infinite;
+        }
+
+        .btn-success:hover {
+            background: #16a34a;
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-outline-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .btn-outline-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
+        /* Grid System */
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -0.75rem;
+        }
+
+        .col-12, .col-md-6, .col-lg-3, .col-md-4 {
+            padding: 0 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .col-12 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+
+        .col-md-6 {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+
+        .col-lg-3 {
+            flex: 0 0 25%;
+            max-width: 25%;
+        }
+
+        .col-md-4 {
+            flex: 0 0 33.333%;
+            max-width: 33.333%;
+        }
+
+        /* Badges */
+        .badge {
+            padding: 0.5em 0.75em;
+            font-size: 0.75em;
+            font-weight: 500;
+            border-radius: 0.375rem;
+        }
+
+        .bg-primary {
+            background-color: #3b82f6 !important;
+        }
+
+        /*.bg-success {
+            background-color: #22c55e !important;
+        }*/
+
+        .bg-secondary {
+            background-color: #6b7280 !important;
+        }
+
+        .bg-info {
+            background-color: #06b6d4 !important;
+        }
+
+        .bg-light {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            color: #fff !important;
+        }
+
+        .bg-white {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+        }
+
+        /* Progress Bar */
+        .progress {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            height: 1rem;
+        }
+
+        .progress-bar {
+            background-color: #22c55e;
+            border-radius: 0.5rem;
+            transition: width 0.6s ease;
+        }
+
+        /* Card specific styles */
+        .card-header {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .card-footer {
+            background: rgba(255, 255, 255, 0.02) !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+        }
+
+        .card-title {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .card-text {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .img-thumbnail {
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0.5rem;
+        }
+
+        .alert-light {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+            border-radius: 0.5rem;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            margin: 2rem 0;
+        }
+
+        .lead {
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+        }
+
+        /* Animations */
+        @keyframes slideUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        @keyframes button-shine {
+            0% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        @keyframes pulse-middle {
+            0%, 100% { opacity: 0.15; transform: translateX(-50%) scale(0.98); }
+            50% { opacity: 0.3; transform: translateX(-50%) scale(1.02); }
+        }
+
+        @keyframes pulse-bottom {
+            0%, 100% { opacity: 0.3; transform: translateX(-50%) scale(1); }
+            50% { opacity: 0.5; transform: translateX(-50%) scale(1.1); }
+        }
+
+        @keyframes pulse-spot {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .col-lg-3 {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .col-md-6, .col-lg-3, .col-md-4 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+            
+            .dashboard-header {
+                padding: 1.5rem 0;
+            }
+            
+            .option-card {
+                padding: 1.25rem;
+            }
+            
+            .modal-dialog {
+                margin: 1rem;
+                max-width: calc(100% - 2rem);
+            }
+            
+            .modal-body {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Utility classes */
+        .d-flex {
+            display: flex !important;
+        }
+
+        .align-items-center {
+            align-items: center !important;
+        }
+
+        .align-items-start {
+            align-items: flex-start !important;
+        }
+
+        .justify-content-between {
+            justify-content: space-between !important;
+        }
+
+        .flex-wrap {
+            flex-wrap: wrap !important;
+        }
+
+        .text-center {
+            text-align: center !important;
+        }
+
+        .fw-bold {
+            font-weight: bold !important;
+        }
+
+        .me-1 { margin-right: 0.25rem !important; }
+        .me-2 { margin-right: 0.5rem !important; }
+        .me-3 { margin-right: 1rem !important; }
+        .mb-0 { margin-bottom: 0 !important; }
+        .mb-1 { margin-bottom: 0.25rem !important; }
+        .mb-2 { margin-bottom: 0.5rem !important; }
+        .mb-3 { margin-bottom: 1rem !important; }
+        .mb-4 { margin-bottom: 1.5rem !important; }
+        .mt-2 { margin-top: 0.5rem !important; }
+        .mt-3 { margin-top: 1rem !important; }
+        .mt-4 { margin-top: 1.5rem !important; }
+
+        .p-2 { padding: 0.5rem !important; }
+        .p-4 { padding: 1.5rem !important; }
+        .py-5 { padding-top: 3rem !important; padding-bottom: 3rem !important; }
+
+        .h-100 { height: 100% !important; }
+        .shadow-sm { box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.3) !important; }
+        .border-0 { border: 0 !important; }
+        .border-top-0 { border-top: 0 !important; }
+        .rounded-pill { border-radius: 50rem !important; }
+        .small { font-size: 0.875em !important; }
+
+        .fa-2x { font-size: 2em !important; }
+        
+        
+        
+        
+        
+        * Calendar input styling */
+input[type="date"], input[type="datetime-local"], input[type="time"] {
+    color-scheme: dark;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 12px 15px;
+    color: #fff;
+    font-size: 15px;
+    transition: all 0.3s ease;
+}
+
+input[type="date"]:focus, input[type="datetime-local"]:focus, input[type="time"]:focus {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(34, 197, 94, 0.5);
+    box-shadow: 0 0 0 0.2rem rgba(34, 197, 94, 0.25);
+    outline: none;
+}
+
+/* Calendar icon styling */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+    background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='%23a855f7' d='M5.5 0a.5.5 0 0 1 .5.5V1h4V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM2 2a1 1 0 0 0-1 1v1h14V3a1 1 0 0 0-1-1H2zm13 3H1v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V5z'/%3e%3c/svg%3e") no-repeat center;
+    background-size: 16px 16px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    opacity: 0.8;
+    filter: none;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover,
+input[type="time"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+        
+        
+        
+    </style>
+</head>
+<body>
+
+<!-- Background glow elements -->
+    <div class="glow-top"></div>
+    <div class="glow-middle"></div>
+    <div class="glow-bottom"></div>
+    <div class="glow-spot-1"></div>
+    <div class="glow-spot-2"></div>
+
+
+
+    <div class="dashboard-header">
+        <div class="container">
+            <a th:href="@{/user/community/{communityId}/share-circle(communityId=${communityId})}" class="back-btn">
+                <i class="fas fa-arrow-left me-2"></i> Back to ShareCircle
+            </a>
+            <h1 class="h3 mb-0">
+                <i class="fas fa-users me-2"></i>Buy Together
+            </h1>
+            <p class="mb-0 text-white-50">Join with others to reduce costs and buy items together</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="option-card" id="startGroupBuyCard" data-bs-toggle="modal" data-bs-target="#groupBuyModal">
+                    <div class="option-icon">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <h3 class="option-title">Start New Group Buy</h3>
+                    <p class="option-desc">Create a new group buying opportunity for your community</p>
+                    <button type="button" class="btn btn-sm btn-success mt-2" data-bs-toggle="modal" data-bs-target="#groupBuyModal" style="display: none;">Open Form</button>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="option-card" data-bs-toggle="modal" data-bs-target="#browseGroupBuysModal">
+                    <div class="option-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3 class="option-title">Browse Active Group Buys</h3>
+                    <p class="option-desc">Explore and join active group buying opportunities</p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="option-card" data-bs-toggle="modal" data-bs-target="#myGroupBuysModal">
+                    <div class="option-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="option-title">My Group Buy Tracker</h3>
+                    <p class="option-desc">Track the progress of your active group buys</p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="option-card" data-bs-toggle="modal" data-bs-target="#pastGroupBuysModal">
+                    <div class="option-icon">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <h3 class="option-title">Past Group Buys (History)</h3>
+                    <p class="option-desc">View your completed group buying activities</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card p-4 border-0 shadow-sm">
+                    <h4><i class="fas fa-info-circle text-info me-2"></i>About Buy Together</h4>
+                    <p>The Buy Together feature allows community members to combine their purchasing power to get better deals on items. By buying in bulk or sharing costs, everyone can save money!</p>
+                    <div class="row mt-3">
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="me-3 text-success"><i class="fas fa-dollar-sign fa-2x"></i></div>
+                                <div>
+                                    <h5 class="mb-1">Save Money</h5>
+                                    <p class="text-muted small mb-0">Get bulk discounts and split delivery costs</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="me-3 text-warning"><i class="fas fa-box fa-2x"></i></div>
+                                <div>
+                                    <h5 class="mb-1">Less Waste</h5>
+                                    <p class="text-muted small mb-0">Buy only what you need and reduce packaging waste</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="me-3 text-primary"><i class="fas fa-handshake fa-2x"></i></div>
+                                <div>
+                                    <h5 class="mb-1">Build Community</h5>
+                                    <p class="text-muted small mb-0">Strengthen community bonds through collaboration</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Browse Group Buys Modal -->
+    <div class="modal fade" id="browseGroupBuysModal" tabindex="-1" aria-labelledby="browseGroupBuysModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="browseGroupBuysModalLabel">Browse Active Group Buys</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Search by item name or category" id="groupBuySearch">
+                                <button class="btn btn-outline-secondary" type="button" id="searchButton"><i class="fas fa-search"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div th:if="${#lists.isEmpty(activeGroupBuys)}" class="text-center py-5">
+                        <i class="fas fa-info-circle text-muted fa-2x mb-3"></i>
+                        <p class="lead">No active group buys found</p>
+                        <p>Be the first to start a group buy in your community!</p>
+                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#groupBuyModal" data-bs-dismiss="modal">
+                            <i class="fas fa-plus-circle me-2"></i>Start a Group Buy
+                        </button>
+                    </div>
+                    
+                    <div th:unless="${#lists.isEmpty(activeGroupBuys)}" class="row">
+                        <div th:each="groupBuy : ${activeGroupBuys}" class="col-md-6 mb-4">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                                    <span class="badge bg-primary rounded-pill">
+                                        <i class="fas fa-users me-1"></i>
+                                        <span th:text="${groupBuy.currentMemberCount} + '/' + ${groupBuy.maxMembers} + ' members'"></span>
+                                    </span>
+                                    <span class="badge bg-success rounded-pill">
+                                        <span th:text="${groupBuy.category}"></span>
+                                    </span>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="me-3">
+                                            <img th:if="${groupBuy.photoData != null}" th:src="@{'/user/community/' + ${communityId} + '/items/getGroupBuyImage/' + ${groupBuy.id}}" class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;" alt="Item image">
+                                            <div th:unless="${groupBuy.photoData != null}" class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                                <i class="fas fa-shopping-basket text-muted fa-2x"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h5 class="card-title mb-1" th:text="${groupBuy.itemName}"></h5>
+                                            <p class="card-text text-muted small mb-1" th:if="${groupBuy.displayName}">
+                                                <i class="fas fa-user me-1"></i> <span th:text="${groupBuy.user.fullName}"></span>
+                                            </p>
+                                            <p class="card-text mb-0">
+                                                <span class="fw-bold">₹<span th:text="${groupBuy.pricePerUnit}"></span></span> per <span th:text="${groupBuy.quantityUnit}"></span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="progress mb-3" style="height: 15px;">
+                                        <div class="progress-bar bg-success" role="progressbar" 
+                                             th:style="'width: ' + (${groupBuy.currentQuantity} * 100 / ${groupBuy.maxQuantity}) + '%'" 
+                                             th:aria-valuenow="${groupBuy.currentQuantity}" 
+                                             aria-valuemin="0" 
+                                             th:aria-valuemax="${groupBuy.maxQuantity}">
+                                            <span class="fw-bold" th:text="${groupBuy.currentQuantity} + '/' + ${groupBuy.maxQuantity} + ' ' + ${groupBuy.quantityUnit}"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex flex-wrap mb-3">
+                                        <div class="me-3 mb-2">
+                                            <i class="fas fa-hourglass-half text-warning me-1"></i>
+                                            <small>Deadline: <span th:text="${#temporals.format(groupBuy.deadlineDateTime, 'MMM dd, yyyy HH:mm')}"></span></small>
+                                        </div>
+                                        <div class="mb-2">
+                                            <i class="fas fa-shopping-cart text-primary me-1"></i>
+                                            <small>Purchase: <span th:text="${#temporals.format(groupBuy.plannedPurchaseTime, 'MMM dd, yyyy HH:mm')}"></span></small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex flex-wrap mb-2">
+                                        <div class="me-3 mb-2" th:if="${groupBuy.pickupWindow != null}">
+                                            <i class="fas fa-clock text-info me-1"></i>
+                                            <small>Pickup: <span th:text="${groupBuy.pickupWindow}"></span></small>
+                                        </div>
+                                        <div class="mb-2">
+                                            <i class="fas fa-map-marker-alt text-danger me-1"></i>
+                                            <small>Pickup at: <span th:text="${groupBuy.deliveryPoint}"></span></small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex flex-wrap mb-2">
+                                        <div class="me-3 mb-2">
+                                            <i class="fas fa-balance-scale text-secondary me-1"></i>
+                                            <small>Min Quantity: <span th:text="${groupBuy.minQuantityNeeded} + ' ' + ${groupBuy.quantityUnit}"></span> | Max: <span th:text="${groupBuy.maxQuantity} + ' ' + ${groupBuy.quantityUnit}"></span></small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex flex-wrap mb-2">
+                                        <div class="mb-2">
+                                            <i class="fas fa-user-shield text-primary me-1"></i>
+                                            <small>Admin: <span th:text="${groupBuy.user.fullName}"></span></small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div th:if="${groupBuy.notesToMembers != null && !groupBuy.notesToMembers.empty}" class="alert alert-light small p-2 mb-3">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        <span th:text="${groupBuy.notesToMembers}"></span>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-white border-top-0 d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="badge bg-secondary me-1" th:if="${groupBuy.advanceContribution}">
+                                            <i class="fas fa-money-bill-wave me-1"></i>Advance Required
+                                        </span>
+                                        <span class="badge bg-info me-1" th:if="${groupBuy.allowPhone}">
+                                            <i class="fas fa-phone me-1"></i>Can Call
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <button class="btn btn-outline-secondary btn-sm me-2" data-bs-toggle="modal" th:data-bs-target="'#groupBuyDetailsModal-' + ${groupBuy.id}">
+                                            <i class="fas fa-info-circle me-1"></i>More Info
+                                        </button>
+                                        <a href="#" class="btn btn-primary btn-sm" data-bs-toggle="modal" th:data-bs-target="'#joinGroupBuyModal-' + ${groupBuy.id}">
+                                            <i th:class="${groupBuy.advanceContribution ? 'fas fa-money-bill-wave me-1' : 'fas fa-plus-circle me-1'}"></i>
+                                            <span th:text="${groupBuy.advanceContribution ? 'Pay & Join' : 'Join'}"></span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Group Buy Modal -->
+    <div class="modal fade" id="groupBuyModal" tabindex="-1" aria-labelledby="groupBuyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="groupBuyModalLabel">Start a Group Buy</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="groupBuyForm" method="post" th:action="@{/user/community/{communityId}/items/buy-together/create(communityId=${communityId})}" enctype="multipart/form-data">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="itemName" class="form-label">Item Name*</label>
+                                <input type="text" class="form-control" id="itemName" name="itemName" placeholder="e.g., Tomatoes, Rice, etc." required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="category" class="form-label">Category*</label>
+                                <select class="form-select" id="category" name="category" required>
+                                    <option value="" selected disabled>Select category</option>
+                                    <option value="Groceries">Groceries</option>
+                                    <option value="Fruits & Vegetables">Fruits & Vegetables</option>
+                                    <option value="Household Items">Household Items</option>
+                                    <option value="Electronics">Electronics</option>
+                                    <option value="Furniture">Furniture</option>
+                                    <option value="Clothing">Clothing</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="maxMembers" class="form-label">Max Members*</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="maxMembers" name="maxMembers" min="2" placeholder="e.g., 10" required>
+                                    <span class="input-group-text" data-bs-toggle="tooltip" title="This is how many people you're hoping will join"><i class="fas fa-info-circle"></i></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="maxQuantity" class="form-label">Max Quantity for Auto-Closing*</label>
+                                <input type="number" class="form-control" id="maxQuantity" name="maxQuantity" min="1" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="minQuantityNeeded" class="form-label">Min Quantity Needed*</label>
+                                <input type="number" class="form-control" id="minQuantityNeeded" name="minQuantityNeeded" min="1" placeholder="e.g., 5" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="quantityUnit" class="form-label">Unit*</label>
+                                <select class="form-select" id="quantityUnit" name="quantityUnit" required>
+                                    <option value="kg">kg</option>
+                                    <option value="litres">litres</option>
+                                    <option value="packets">packets</option>
+                                    <option value="dozen">dozen</option>
+                                    <option value="pieces">pieces</option>
+                                    <option value="boxes">boxes</option>
+                                    <option value="other">other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="pricePerUnit" class="form-label">Expected Price Per Unit*</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">₹</span>
+                                    <input type="number" class="form-control" id="pricePerUnit" name="pricePerUnit" min="0" step="0.01" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="deadlineDateTime" class="form-label">Deadline to Join Group Buy*</label>
+                                <input type="datetime-local" class="form-control" id="deadlineDateTime" name="deadlineDateTime" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="plannedPurchaseTime" class="form-label">Planned Purchase Time*</label>
+                                <div class="input-group">
+                                    <input type="datetime-local" class="form-control" id="plannedPurchaseTime" name="plannedPurchaseTime" required>
+                                    <span class="input-group-text" data-bs-toggle="tooltip" title="Let members know when you'll go to buy"><i class="fas fa-info-circle"></i></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="pickupWindow" class="form-label">Pickup Window (Optional)</label>
+                                <input type="text" class="form-control" id="pickupWindow" name="pickupWindow" placeholder="e.g., Tomorrow 8–11 AM">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="deliveryPoint" class="form-label">Delivery/Pickup Point*</label>
+                                <input type="text" class="form-control" id="deliveryPoint" name="deliveryPoint" placeholder="e.g., Flat 101, Main Gate" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="autoConfirmMembers" name="autoConfirmMembers" checked>
+                                    <label class="form-check-label" for="autoConfirmMembers">Auto-confirm people as soon as they join</label>
+                                    <small class="form-text text-muted d-block">Tip: No need to wait for manual approval. Ensures smooth group flow.</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="confirmationRequired" name="confirmationRequired">
+                                    <label class="form-check-label" for="confirmationRequired">Confirmation Required Before Deadline</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="allowCancellation" name="allowCancellation">
+                                    <label class="form-check-label" for="allowCancellation">Allow Last-Minute Cancellation</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="notesToMembers" class="form-label">Notes to Members (Optional)</label>
+                            <textarea class="form-control" id="notesToMembers" name="notesToMembers" rows="3" placeholder="e.g., Hey all, I'll go to main market tomorrow morning. Make sure to collect items from my flat by 10 AM latest. Bring exact change."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="itemPhoto" class="form-label">Upload Image (Optional)</label>
+                            <input type="file" class="form-control" id="itemPhoto" name="itemPhoto" accept="image/*">
+                            <small class="form-text text-muted">Upload a photo of the item or vendor ad for trust</small>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="displayName" name="displayName" checked>
+                                    <label class="form-check-label" for="displayName">Display My Name</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="allowPhone" name="allowPhone">
+                                    <label class="form-check-label" for="allowPhone">Allow Phone Call for Clarification</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="onlyAutoConfirmed" name="onlyAutoConfirmed">
+                                    <label class="form-check-label" for="onlyAutoConfirmed">Only Allow Auto-Confirmed Users</label>
+                                    <small class="form-text text-muted d-block">System will confirm on their behalf</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="advanceContribution" name="advanceContribution">
+                                    <label class="form-check-label" for="advanceContribution">Advance Contribution Required</label>
+                                    <small class="form-text text-muted d-block">Via UPI or in cash</small>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" form="groupBuyForm" class="btn btn-success">Create Group Buy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- My Group Buys Modal -->
+    <div class="modal fade" id="myGroupBuysModal" tabindex="-1" aria-labelledby="myGroupBuysModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="myGroupBuysModalLabel">My Group Buy Tracker</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs mb-4" id="myGroupBuysTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="organized-tab" data-bs-toggle="tab" data-bs-target="#organized" type="button" role="tab" aria-controls="organized" aria-selected="true">
+                                <i class="fas fa-user-tie me-1"></i>Organized by Me
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="joined-tab" data-bs-toggle="tab" data-bs-target="#joined" type="button" role="tab" aria-controls="joined" aria-selected="false">
+                                <i class="fas fa-handshake me-1"></i>Joined by Me
+                            </button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content" id="myGroupBuysTabContent">
+                        <!-- Organized by Me Tab -->
+                        <div class="tab-pane fade show active" id="organized" role="tabpanel" aria-labelledby="organized-tab">
+                            <div th:if="${#lists.isEmpty(organizedGroupBuys)}" class="text-center py-5">
+                                <i class="fas fa-info-circle text-muted fa-2x mb-3"></i>
+                                <p class="lead">You haven't organized any group buys yet</p>
+                                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#groupBuyModal" data-bs-dismiss="modal">
+                                    <i class="fas fa-plus-circle me-2"></i>Start a Group Buy
+                                </button>
+                            </div>
+                            
+                            <div th:if="${!#lists.isEmpty(organizedGroupBuys)}" class="row">
+                                <div th:each="groupBuy : ${organizedGroupBuys}" class="col-md-6 mb-4">
+                                    <div class="card h-100 shadow-sm border-success">
+                                        <div class="card-header bg-light p-3">
+                                            <!-- Status Badge: Open/Locked/Completed/Cancelled -->
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <div>
+                                                    <span th:if="${groupBuy.status == 'OPEN'}" class="badge bg-success fs-6 px-3 py-2">OPEN</span>
+                                                    <span th:if="${groupBuy.status == 'LOCKED'}" class="badge bg-warning text-dark fs-6 px-3 py-2">LOCKED</span>
+                                                    <span th:if="${groupBuy.status == 'COMPLETED'}" class="badge bg-info fs-6 px-3 py-2">COMPLETED</span>
+                                                    <span th:if="${groupBuy.status == 'CANCELLED'}" class="badge bg-danger fs-6 px-3 py-2">CANCELLED</span>
+                                                </div>
+                                                <span class="badge bg-primary rounded-pill px-3">
+                                                    <span th:text="${groupBuy.category}"></span>
+                                                </span>
+                                            </div>
+                                            <div class="small text-muted">
+                                                <span>Status: </span>
+                                                <span th:if="${groupBuy.status == 'OPEN'}" class="fw-bold text-success">Open for Joining</span>
+                                                <span th:if="${groupBuy.status == 'LOCKED'}" class="fw-bold text-warning">Locked - Purchase Planned</span>
+                                                <span th:if="${groupBuy.status == 'COMPLETED'}" class="fw-bold text-info">Completed</span>
+                                                <span th:if="${groupBuy.status == 'CANCELLED'}" class="fw-bold text-danger">Cancelled</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Item Image -->
+                                        <div class="text-center p-3">
+                                            <img th:if="${groupBuy.photoData != null}" th:src="@{'/user/community/' + ${communityId} + '/items/getGroupBuyImage/' + ${groupBuy.id}}" class="img-fluid rounded" style="height: 120px; object-fit: cover;" alt="Item image">
+                                            <div th:unless="${groupBuy.photoData != null}" class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 120px;">
+                                                <i class="fas fa-shopping-basket text-muted fa-3x"></i>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="card-body pt-0">
+                                            <h5 class="card-title" th:text="${groupBuy.itemName}"></h5>
+                                            
+                                            <!-- Urgency message -->
+                                            <div class="mb-3" th:if="${urgencyMessages != null && urgencyMessages.containsKey(groupBuy.id)}">
+                                                <div class="alert alert-warning py-2 px-3 mb-0 small">
+                                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                                    <span th:text="${urgencyMessages.get(groupBuy.id)}"></span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <span class="text-muted small">
+                                                    <i class="fas fa-users me-1"></i>
+                                                    <span th:text="${groupBuy.currentMemberCount} + '/' + ${groupBuy.maxMembers} + ' members'"></span>
+                                                </span>
+                                                <span class="text-primary fw-bold">
+                                                    ₹<span th:text="${groupBuy.pricePerUnit}"></span>/<span th:text="${groupBuy.quantityUnit}"></span>
+                                                </span>
+                                            </div>
+                                            
+                                            <div class="progress mb-3" style="height: 10px;">
+                                                <div class="progress-bar bg-success" role="progressbar" 
+                                                     th:style="'width: ' + (${groupBuy.currentQuantity} * 100 / ${groupBuy.maxQuantity}) + '%'" 
+                                                     th:aria-valuenow="${groupBuy.currentQuantity}" 
+                                                     aria-valuemin="0" 
+                                                     th:aria-valuemax="${groupBuy.maxQuantity}">
+                                                </div>
+                                            </div>
+                                            <div class="text-center small mb-3">
+                                                <span class="fw-bold" th:text="${groupBuy.currentQuantity} + '/' + ${groupBuy.maxQuantity} + ' ' + ${groupBuy.quantityUnit}"></span>
+                                            </div>
+                                            
+                                            <div class="d-flex flex-wrap justify-content-between mb-3">
+                                                <div class="small">
+                                                    <i class="fas fa-hourglass-half text-warning me-1"></i>
+                                                    <span th:text="${#temporals.format(groupBuy.deadlineDateTime, 'MMM dd, HH:mm')}"></span>
+                                                </div>
+                                                <div class="small">
+                                                    <i class="fas fa-shopping-cart text-primary me-1"></i>
+                                                    <span th:text="${#temporals.format(groupBuy.plannedPurchaseTime, 'MMM dd, HH:mm')}"></span>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Cancellation reason if cancelled - shown more prominently for cancelled items -->
+                                            <div th:if="${groupBuy.status == 'CANCELLED'}" class="border border-danger rounded p-3 bg-danger bg-opacity-10 mt-3">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <span class="bg-white text-danger rounded-circle d-inline-flex justify-content-center align-items-center me-2" style="width: 24px; height: 24px;">
+                                                        <i class="fas fa-times"></i>
+                                                    </span>
+                                                    <strong class="text-danger">GROUP BUY CANCELLED</strong>
+                                                </div>
+                                                <div class="mt-2">
+                                                    <strong>Reason:</strong>
+                                                    <p class="mb-0" th:text="${groupBuy.cancellationReason != null ? groupBuy.cancellationReason : 'No reason provided'}"></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="card-footer bg-white pt-3 pb-3">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <button class="btn btn-outline-primary" data-bs-toggle="modal" th:data-bs-target="'#viewMembersModal-' + ${groupBuy.id}">
+                                                    <i class="fas fa-users me-1"></i> View Members
+                                                </button>
+                                                
+                                                <!-- Cancel group button (only for open or locked group buys) -->
+                                                <button th:if="${groupBuy.status == 'OPEN' || groupBuy.status == 'LOCKED'}" class="btn btn-danger" data-bs-toggle="modal" th:data-bs-target="'#cancelModal-' + ${groupBuy.id}">
+                                                    <span class="me-1">❌</span> Cancel Group Buy
+                                                </button>
+                                            </div>
+                                            
+                                            <div class="d-grid gap-2">
+                                                <!-- Lock group button (only for open group buys) -->
+                                                <a th:if="${groupBuy.status == 'OPEN'}" th:href="@{'/user/community/' + ${communityId} + '/items/group-buy/' + ${groupBuy.id} + '/lock'}" class="btn btn-warning">
+                                                    <i class="fas fa-lock me-1"></i> Lock Group
+                                                </a>
+                                                
+                                                <!-- Complete group button (only for locked group buys) -->
+                                                <a th:if="${groupBuy.status == 'LOCKED'}" th:href="@{'/user/community/' + ${communityId} + '/items/group-buy/' + ${groupBuy.id} + '/complete'}" class="btn btn-info">
+                                                    <i class="fas fa-check-double me-1"></i> Complete Group Buy
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Joined by Me Tab -->
+                        <div class="tab-pane fade" id="joined" role="tabpanel" aria-labelledby="joined-tab">
+                            <div th:if="${#lists.isEmpty(joinedGroupBuys)}" class="text-center py-5">
+                                <i class="fas fa-info-circle text-muted fa-2x mb-3"></i>
+                                <p class="lead">You haven't joined any group buys yet</p>
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#browseGroupBuysModal" data-bs-dismiss="modal">
+                                    <i class="fas fa-search me-2"></i>Browse Group Buys
+                                </button>
+                            </div>
+                            
+                            <div th:if="${!#lists.isEmpty(joinedGroupBuys)}" class="row">
+                                <div th:each="groupBuy : ${joinedGroupBuys}" class="col-md-6 mb-4">
+                                    <div class="card h-100 shadow-sm border-primary">
+                                        <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                                            <span class="badge bg-primary rounded-pill">
+                                                <i class="fas fa-users me-1"></i>
+                                                <span th:text="${groupBuy.currentMemberCount} + '/' + ${groupBuy.maxMembers} + ' members'"></span>
+                                            </span>
+                                            <span class="badge bg-success rounded-pill">
+                                                <span th:text="${groupBuy.category}"></span>
+                                            </span>
+                                        </div>
+                                        <div class="card-body">
+                                            <h5 class="card-title" th:text="${groupBuy.itemName}"></h5>
+                                            
+                                            <p class="card-text text-muted small mb-2" th:if="${groupBuy.displayName}">
+                                                <i class="fas fa-user me-1"></i> Organized by <span th:text="${groupBuy.user.fullName}"></span>
+                                            </p>
+                                            
+                                            <div class="progress mb-3" style="height: 15px;">
+                                                <div class="progress-bar bg-success" role="progressbar" 
+                                                     th:style="'width: ' + (${groupBuy.currentQuantity} * 100 / ${groupBuy.maxQuantity}) + '%'" 
+                                                     th:aria-valuenow="${groupBuy.currentQuantity}" 
+                                                     aria-valuemin="0" 
+                                                     th:aria-valuemax="${groupBuy.maxQuantity}">
+                                                    <span class="fw-bold" th:text="${groupBuy.currentQuantity} + '/' + ${groupBuy.maxQuantity} + ' ' + ${groupBuy.quantityUnit}"></span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="d-flex flex-wrap mb-3">
+                                                <div class="me-3 mb-2">
+                                                    <i class="fas fa-hourglass-half text-warning me-1"></i>
+                                                    <small>Deadline: <span th:text="${#temporals.format(groupBuy.deadlineDateTime, 'MMM dd, yyyy HH:mm')}"></span></small>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <i class="fas fa-shopping-cart text-primary me-1"></i>
+                                                    <small>Purchase: <span th:text="${#temporals.format(groupBuy.plannedPurchaseTime, 'MMM dd, yyyy HH:mm')}"></span></small>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="alert alert-info small p-2 mb-0">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                <strong>Your contribution:</strong> <span>3 kg</span>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer bg-white border-top-0 d-flex justify-content-between align-items-center">
+                                            <span class="badge bg-info"><i class="fas fa-user-friends me-1"></i>Member</span>
+                                            <a href="#" class="btn btn-outline-danger btn-sm">
+                                                <i class="fas fa-times-circle me-1"></i>Leave
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Past Group Buys Modal -->
+    <div class="modal fade" id="pastGroupBuysModal" tabindex="-1" aria-labelledby="pastGroupBuysModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-secondary text-white">
+                    <h5 class="modal-title" id="pastGroupBuysModalLabel">Past Group Buys (History)</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Search in history" id="historySearch">
+                                <button class="btn btn-outline-secondary" type="button"><i class="fas fa-search"></i></button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <select class="form-select" id="historyTimeRange">
+                                <option value="all" selected>All Time</option>
+                                <option value="1month">Last Month</option>
+                                <option value="3months">Last 3 Months</option>
+                                <option value="6months">Last 6 Months</option>
+                                <option value="1year">Last Year</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center py-5">
+                        <i class="fas fa-history text-muted fa-2x mb-3"></i>
+                        <p class="lead">No completed group buys found</p>
+                        <p>Your completed group buys will be shown here for reference</p>
+                    </div>
+                    
+                    <!-- This section will be populated with actual past group buys when available -->
+                    <div class="d-none">
+                        <div class="card mb-3 shadow-sm">
+                            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">Tomatoes - Bulk Purchase</h6>
+                                <span class="badge bg-secondary">Completed on May 10, 2025</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><i class="fas fa-users text-primary me-2"></i> 8 members participated</p>
+                                        <p><i class="fas fa-shopping-basket text-success me-2"></i> Total: 20 kg @ ₹25/kg</p>
+                                        <p><i class="fas fa-user text-info me-2"></i> Your contribution: 3 kg</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><i class="fas fa-money-bill-wave text-danger me-2"></i> You saved: ₹30</p>
+                                        <p><i class="fas fa-map-marker-alt text-warning me-2"></i> Pickup: Flat 101</p>
+                                        <p><i class="fas fa-check-circle text-success me-2"></i> Status: Completed</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Join Group Buy Modals - Dynamically generated for each group buy -->
+    <div th:each="groupBuy : ${activeGroupBuys}" th:id="'joinGroupBuyModal-' + ${groupBuy.id}" class="modal fade" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div th:class="${groupBuy.advanceContribution ? 'modal-header bg-warning text-dark' : 'modal-header bg-success text-white'}">
+                    <h5 class="modal-title">
+                        <i th:class="${groupBuy.advanceContribution ? 'fas fa-money-bill-wave me-2' : 'fas fa-plus-circle me-2'}"></i>
+                        <span th:text="${groupBuy.advanceContribution ? 'Pay & Join: ' + groupBuy.itemName : 'Join: ' + groupBuy.itemName}"></span>
+                    </h5>
+                    <button type="button" class="btn-close" th:class="${groupBuy.advanceContribution ? 'btn-close' : 'btn-close btn-close-white'}" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/user/community/{communityId}/items/buy-together/join(communityId=${communityId})}" method="post">
+                    <input type="hidden" name="groupBuyId" th:value="${groupBuy.id}">
+                    <div class="modal-body">
+                        <!-- Common form fields for both payment and non-payment flows -->
+                        <div class="mb-3">
+                            <label for="quantity" class="form-label fw-bold">How much do you want to buy?*</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="quantity" name="quantity" min="1" th:max="${groupBuy.maxQuantity - groupBuy.currentQuantity}" required>
+                                <span class="input-group-text" th:text="${groupBuy.quantityUnit}"></span>
+                            </div>
+                            <div class="form-text">
+                                <span th:text="'Available: ' + (${groupBuy.maxQuantity - groupBuy.currentQuantity}) + ' ' + ${groupBuy.quantityUnit}"></span> | 
+                                <span th:text="'Price: ₹' + ${groupBuy.pricePerUnit} + ' per ' + ${groupBuy.quantityUnit}"></span>
+                            </div>
+                        </div>
+                        
+                        <!-- Payment section only shown if advance contribution is required -->
+                        <div th:if="${groupBuy.advanceContribution}" class="border rounded p-3 mb-3 bg-light">
+                            <h6 class="mb-3">Payment Information</h6>
+                            
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <span>This group buy requires advance payment to confirm your participation.</span>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Payment Summary</label>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Price per unit:</span>
+                                    <span class="fw-bold" th:text="'₹' + ${groupBuy.pricePerUnit}"></span>
+                                </div>
+                                <div class="d-flex justify-content-between border-top pt-2 fw-bold">
+                                    <span>Total amount to pay:</span>
+                                    <span id="totalAmount" class="text-primary">₹0</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Payment Method</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="paymentMethod" id="cashPayment" value="cash" checked>
+                                    <label class="form-check-label" for="cashPayment">Cash on Delivery</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="paymentMethod" id="upiPayment" value="upi">
+                                    <label class="form-check-label" for="upiPayment">UPI Transfer</label>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3 d-none" id="upiDetails">
+                                <label class="form-label">Admin's UPI Details</label>
+                                <div class="alert alert-light border p-2">
+                                    <div><strong>UPI ID:</strong> <span th:text="${groupBuy.user.email}"></span>@upi</div>
+                                    <div><strong>Name:</strong> <span th:text="${groupBuy.user.fullName}"></span></div>
+                                    <div class="small text-muted mt-2">Please mention your name and group buy item in the payment note.</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Additional Notes (Optional)</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="2" placeholder="Any specific requirements or questions for the group admin?"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" th:class="${groupBuy.advanceContribution ? 'btn btn-warning' : 'btn btn-success'}">
+                            <i th:class="${groupBuy.advanceContribution ? 'fas fa-money-bill-wave me-1' : 'fas fa-check-circle me-1'}"></i>
+                            <span th:text="${groupBuy.advanceContribution ? 'Confirm Payment & Join' : 'Confirm Participation'}"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Group Buy Details Modal Template - Will be dynamically generated for each group buy -->
+    <div th:each="groupBuy : ${activeGroupBuys}" th:id="'groupBuyDetailsModal-' + ${groupBuy.id}" class="modal fade" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <span th:text="${groupBuy.itemName} + ' - Details'"></span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-4 mb-md-0 text-center">
+                            <img th:if="${groupBuy.photoData != null}" th:src="@{'/user/community/' + ${communityId} + '/items/getGroupBuyImage/' + ${groupBuy.id}}" class="img-thumbnail mb-3" style="width: 200px; height: 200px; object-fit: cover;" alt="Item image">
+                            <div th:unless="${groupBuy.photoData != null}" class="bg-light rounded d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 200px; height: 200px;">
+                                <i class="fas fa-image text-muted fa-4x"></i>
+                            </div>
+                            
+                            <div class="progress mb-2" style="height: 20px;">
+                                <div class="progress-bar bg-success" role="progressbar" 
+                                     th:style="'width: ' + (${groupBuy.currentQuantity} * 100 / ${groupBuy.maxQuantity}) + '%'" 
+                                     th:aria-valuenow="${groupBuy.currentQuantity}" 
+                                     aria-valuemin="0" 
+                                     th:aria-valuemax="${groupBuy.maxQuantity}">
+                                    <span class="fw-bold" th:text="${groupBuy.currentQuantity} + '/' + ${groupBuy.maxQuantity}"></span>
+                                </div>
+                            </div>
+                            <p class="text-center small text-muted">
+                                <span th:text="${groupBuy.currentQuantity} + ' of ' + ${groupBuy.maxQuantity} + ' ' + ${groupBuy.quantityUnit}"></span> collected
+                            </p>
+                        </div>
+                        
+                        <div class="col-md-8">
+                            <h4 class="mb-3" th:text="${groupBuy.itemName}"></h4>
+                            
+                            <div class="row mb-4">
+                                <div class="col-6">
+                                    <h6 class="text-muted mb-2">Group Admin</h6>
+                                    <p>
+                                        <i class="fas fa-user-shield text-primary me-2"></i>
+                                        <span th:text="${groupBuy.user.fullName}"></span>
+                                        <span th:if="${groupBuy.allowPhone}" class="d-block mt-1">
+                                            <i class="fas fa-phone-alt text-success me-2"></i>
+                                            <a th:href="'tel:' + ${groupBuy.user.phoneNumber}" th:text="${groupBuy.user.phoneNumber}"></a>
+                                            <small class="text-muted">(Call for clarifications)</small>
+                                        </span>
+                                    </p>
+                                </div>
+                                <div class="col-6">
+                                    <h6 class="text-muted mb-2">Category</h6>
+                                    <p>
+                                        <i class="fas fa-tag text-success me-2"></i>
+                                        <span th:text="${groupBuy.category}"></span>
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col-6">
+                                    <h6 class="text-muted mb-2">Quantity Limits</h6>
+                                    <p>
+                                        <i class="fas fa-balance-scale text-secondary me-2"></i>
+                                        Min: <span th:text="${groupBuy.minQuantityNeeded} + ' ' + ${groupBuy.quantityUnit}"></span><br>
+                                        Max: <span th:text="${groupBuy.maxQuantity} + ' ' + ${groupBuy.quantityUnit}"></span>
+                                    </p>
+                                </div>
+                                <div class="col-6">
+                                    <h6 class="text-muted mb-2">Price</h6>
+                                    <p>
+                                        <span th:text="'Min: ' + ${groupBuy.minQuantityNeeded} + ${groupBuy.quantityUnit}"></span>
+                                        <span th:if="${groupBuy.maxQuantity > 0}" th:text="', Max: ' + ${groupBuy.maxQuantity} + ${groupBuy.quantityUnit}"></span>
+                                        <span th:if="${groupBuy.currentQuantity > 0}" class="text-muted d-block small" th:text="'Current: ' + ${groupBuy.currentQuantity} + ${groupBuy.quantityUnit}"></span>
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col-6">
+                                    <h6 class="text-muted mb-2">Members</h6>
+                                    <p>
+                                        <i class="fas fa-users text-info me-2"></i>
+                                        <span th:text="${groupBuy.currentMemberCount} + ' of ' + ${groupBuy.maxMembers}"></span> members joined
+                                    </p>
+                                </div>
+                                <div class="col-6">
+                                    <h6 class="text-muted mb-2">Pickup/Delivery</h6>
+                                    <p>
+                                        <i class="fas fa-map-marker-alt text-danger me-2"></i>
+                                        <span th:text="${groupBuy.deliveryPoint}"></span>
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col-6">
+                                    <h6 class="text-muted mb-2">Join Deadline</h6>
+                                    <p>
+                                        <i class="fas fa-hourglass-half text-warning me-2"></i>
+                                        <span th:text="${#temporals.format(groupBuy.deadlineDateTime, 'MMM dd, yyyy HH:mm')}"></span>
+                                    </p>
+                                </div>
+                                <div class="col-6">
+                                    <h6 class="text-muted mb-2">Planned Purchase</h6>
+                                    <p>
+                                        <i class="fas fa-shopping-cart text-primary me-2"></i>
+                                        <span th:text="${#temporals.format(groupBuy.plannedPurchaseTime, 'MMM dd, yyyy HH:mm')}"></span>
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div th:if="${groupBuy.pickupWindow != null}" class="mb-4">
+                                <h6 class="text-muted mb-2">Pickup Window</h6>
+                                <p>
+                                    <i class="fas fa-clock text-info me-2"></i>
+                                    <span th:text="${groupBuy.pickupWindow}"></span>
+                                </p>
+                            </div>
+                            
+                            <div th:if="${groupBuy.notesToMembers != null && !groupBuy.notesToMembers.empty}" class="mb-4">
+                                <h6 class="text-muted mb-2">Notes from Admin</h6>
+                                <div class="alert alert-light p-3">
+                                    <i class="fas fa-info-circle text-primary me-2"></i>
+                                    <span th:text="${groupBuy.notesToMembers}"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h6 class="text-muted mb-2">Group Settings</h6>
+                                <ul class="list-group">
+                                    <li class="list-group-item" th:if="${groupBuy.autoConfirmMembers}">
+                                        <i class="fas fa-check-circle text-success me-2"></i>
+                                        Auto-confirms new members
+                                    </li>
+                                    <li class="list-group-item" th:unless="${groupBuy.autoConfirmMembers}">
+                                        <i class="fas fa-times-circle text-danger me-2"></i>
+                                        Manual approval of members required
+                                    </li>
+                                    <li class="list-group-item" th:if="${groupBuy.confirmationRequired}">
+                                        <i class="fas fa-check-double text-warning me-2"></i>
+                                        Confirmation required before deadline
+                                    </li>
+                                    <li class="list-group-item" th:if="${groupBuy.allowCancellation}">
+                                        <i class="fas fa-undo text-info me-2"></i>
+                                        Last-minute cancellations allowed
+                                    </li>
+                                    <li class="list-group-item" th:if="${groupBuy.advanceContribution}">
+                                        <i class="fas fa-money-bill-wave text-secondary me-2"></i>
+                                        Advance payment required
+                                    </li>
+                                    <li class="list-group-item" th:if="${groupBuy.allowPhone}">
+                                        <i class="fas fa-phone text-primary me-2"></i>
+                                        Phone contact allowed
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <!-- Deal Over button when group buy is full, Join button otherwise -->
+                    <button th:if="${fullGroupBuys != null && fullGroupBuys.containsKey(groupBuy.id) && fullGroupBuys.get(groupBuy.id)}" 
+                          class="btn btn-secondary" disabled>
+                        <i class="fas fa-ban me-1"></i> Deal Over
+                    </button>
+                    
+                    <a th:unless="${fullGroupBuys != null && fullGroupBuys.containsKey(groupBuy.id) && fullGroupBuys.get(groupBuy.id)}" 
+                       href="#" class="btn btn-primary" data-bs-toggle="modal" 
+                       th:data-bs-target="'#joinGroupBuyModal-' + ${groupBuy.id}" data-bs-dismiss="modal">
+                        <i th:class="${groupBuy.advanceContribution ? 'fas fa-money-bill-wave me-1' : 'fas fa-plus-circle me-1'}"></i>
+                        <span th:text="${groupBuy.advanceContribution ? 'Pay & Join This Group Buy' : 'Join This Group Buy'}"></span>
+                    </a>
+                    
+                    <!-- Urgency message if any -->
+                    <div class="mt-2" th:if="${urgencyMessages != null && urgencyMessages.containsKey(groupBuy.id)}">
+                        <div class="alert alert-warning py-1 px-2 mb-0 small">
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            <span th:text="${urgencyMessages.get(groupBuy.id)}"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Past Group Buys Modal -->
+    <div class="modal fade" id="pastGroupBuysModal" tabindex="-1" aria-labelledby="pastGroupBuysModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-secondary text-white">
+                    <h5 class="modal-title" id="pastGroupBuysModalLabel">Past Group Buy History</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs mb-4" id="pastGroupBuysTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="past-organized-tab" data-bs-toggle="tab" data-bs-target="#past-organized" type="button" role="tab" aria-controls="past-organized" aria-selected="true">
+                                <i class="fas fa-user-tie me-1"></i>Organized by Me
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="past-joined-tab" data-bs-toggle="tab" data-bs-target="#past-joined" type="button" role="tab" aria-controls="past-joined" aria-selected="false">
+                                <i class="fas fa-handshake me-1"></i>Joined by Me
+                            </button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content" id="pastGroupBuysTabContent">
+                        <!-- Past Organized Tab -->
+                        <div class="tab-pane fade show active" id="past-organized" role="tabpanel" aria-labelledby="past-organized-tab">
+                            <div class="text-center py-5">
+                                <i class="fas fa-history text-muted fa-2x mb-3"></i>
+                                <p class="lead">Your past organized group buys will appear here</p>
+                                <p class="text-muted">This feature will be available soon!</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Past Joined Tab -->
+                        <div class="tab-pane fade" id="past-joined" role="tabpanel" aria-labelledby="past-joined-tab">
+                            <div class="text-center py-5">
+                                <i class="fas fa-history text-muted fa-2x mb-3"></i>
+                                <p class="lead">Your past joined group buys will appear here</p>
+                                <p class="text-muted">This feature will be available soon!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- View Members Modals -->
+    <th:block th:each="groupBuy : ${organizedGroupBuys ?: {}}">
+        <div class="modal fade" th:id="'viewMembersModal-' + ${groupBuy.id}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">
+                            <i class="fas fa-users me-2"></i>
+                            Group Members - <span th:text="${groupBuy.itemName}"></span>
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div>
+                                        <span class="badge" th:class="${groupBuy.status == 'OPEN' ? 'bg-success' : (groupBuy.status == 'LOCKED' ? 'bg-warning text-dark' : (groupBuy.status == 'COMPLETED' ? 'bg-info' : 'bg-danger'))}" th:text="${groupBuy.status}"></span>
+                                        <span class="badge bg-primary ms-2">
+                                            <i class="fas fa-users me-1"></i>
+                                            <span th:text="${groupBuy.currentMemberCount} + '/' + ${groupBuy.maxMembers} + ' members'"></span>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <span class="text-muted">Total Quantity: </span>
+                                        <span class="fw-bold" th:text="${groupBuy.currentQuantity} + ' ' + ${groupBuy.quantityUnit}"></span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Member List with detailed information -->
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-bordered">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Member</th>
+                                                <th>Quantity</th>
+                                                <th>Joined At</th>
+                                                <th>Contact</th>
+                                                <th>Status</th>
+                                                <th>Score</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="member : ${groupBuy.members}" th:class="${member.leftGroup ? 'table-danger' : (member.received ? 'table-success' : '')}">
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="fw-bold" th:text="${member.user.fullName}"></span>
+                                                        <span th:if="${member.isCreator}" class="badge bg-success ms-2">Admin</span>
+                                                    </div>
+                                                </td>
+                                                <td th:text="${member.quantity} + ' ' + ${groupBuy.quantityUnit}"></td>
+                                                <td th:text="${#temporals.format(member.joinedAt, 'MMM dd, yyyy HH:mm')}"></td>
+                                                <td>
+                                                    <a th:if="${member.user.phoneNumber != null && groupBuy.allowPhone}" th:href="'tel:' + ${member.user.phoneNumber}" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-phone"></i> <span th:text="${member.user.phoneNumber}"></span>
+                                                    </a>
+                                                    <span th:unless="${member.user.phoneNumber != null && groupBuy.allowPhone}" class="text-muted">Not available</span>
+                                                </td>
+                                                <td>
+                                                    <span th:if="${member.leftGroup}" class="badge bg-danger">Left Group</span>
+                                                    <span th:unless="${member.leftGroup}" th:class="${member.received ? 'badge bg-success' : 'badge bg-secondary'}">
+                                                        <i class="fas" th:class="${member.received ? 'fa-check-circle' : 'fa-circle'}"></i>
+                                                        <span th:text="${member.received ? 'Received' : 'Pending'}"></span>
+                                                    </span>
+                                                    <span th:if="${member.receiptTime != null}" class="d-block small text-muted" th:text="'Received: ' + ${#temporals.format(member.receiptTime, 'MMM dd')}"></span>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="badge bg-info">
+                                                            <i class="fas fa-star"></i>
+                                                            <span th:text="${member.memberScore}"></span>
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </th:block>
+    
+    <!-- Cancel Group Buy Modals -->
+    <th:block th:each="groupBuy : ${organizedGroupBuys ?: {}}">
+        <div class="modal fade" th:id="'cancelModal-' + ${groupBuy.id}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title">Cancel Group Buy</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form th:action="@{/user/community/{communityId}/items/group-buy/{groupBuyId}/cancel(communityId=${communityId},groupBuyId=${groupBuy.id})}" method="post">
+                        <div class="modal-body">
+                            <p>Are you sure you want to cancel this group buy for <strong th:text="${groupBuy.itemName}"></strong>?</p>
+                            <p>All members will be notified that the group buy has been cancelled.</p>
+                            
+                            <div class="mb-3">
+                                <label for="cancellationReason" class="form-label">Reason for Cancellation</label>
+                                <textarea class="form-control" id="cancellationReason" name="cancellationReason" rows="3" required placeholder="Please explain why you're cancelling this group buy"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Back</button>
+                            <button type="submit" class="btn btn-danger">Cancel Group Buy</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </th:block>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+            
+            // Initialize all modals
+            var modals = [].slice.call(document.querySelectorAll('.modal'));
+            var modalInstances = modals.map(function(modalEl) {
+                return new bootstrap.Modal(modalEl);
+            });
+            
+            // Add direct click handlers for the option cards
+            document.querySelectorAll('.option-card').forEach(function(card) {
+                card.addEventListener('click', function() {
+                    var targetModalId = this.getAttribute('data-bs-target');
+                    if (targetModalId) {
+                        var targetModal = document.querySelector(targetModalId);
+                        if (targetModal) {
+                            var modal = bootstrap.Modal.getInstance(targetModal);
+                            if (!modal) {
+                                modal = new bootstrap.Modal(targetModal);
+                            }
+                            modal.show();
+                        }
+                    }
+                });
+            });
+            
+            // Handle join modal functionality
+            document.querySelectorAll('[id^="joinGroupBuyModal-"]').forEach(function(modal) {
+                var groupBuyId = modal.id.split('-')[1];
+                var quantityInput = modal.querySelector('input[name="quantity"]');
+                var totalAmountSpan = modal.querySelector('#totalAmount');
+                var pricePerUnitText = modal.querySelector('.form-text').textContent;
+                var pricePerUnit = parseFloat(pricePerUnitText.match(/₹([\d.]+)/)[1]);
+                
+                // Calculate total amount when quantity changes
+                if (quantityInput && totalAmountSpan) {
+                    quantityInput.addEventListener('input', function() {
+                        var quantity = parseFloat(this.value) || 0;
+                        var total = quantity * pricePerUnit;
+                        totalAmountSpan.textContent = '₹' + total.toFixed(2);
+                    });
+                }
+                
+                // Toggle UPI details visibility based on payment method selection
+                var upiPaymentRadio = modal.querySelector('#upiPayment');
+                
+
+                
+                var cashPaymentRadio = modal.querySelector('#cashPayment');
+                var upiDetailsDiv = modal.querySelector('#upiDetails');
+                
+                if (upiPaymentRadio && cashPaymentRadio && upiDetailsDiv) {
+                    upiPaymentRadio.addEventListener('change', function() {
+                        if (this.checked) {
+                            upiDetailsDiv.classList.remove('d-none');
+                        }
+                    });
+                    
+                    cashPaymentRadio.addEventListener('change', function() {
+                        if (this.checked) {
+                            upiDetailsDiv.classList.add('d-none');
+                        }
+                    });
+                }
+            });
+            
+            // Implement search functionality for Browse Active Group Buys
+            var groupBuySearch = document.getElementById('groupBuySearch');
+            var searchButton = document.getElementById('searchButton');
+            
+            function filterGroupBuys() {
+                var searchTerm = groupBuySearch.value.toLowerCase().trim();
+                var groupBuyCards = document.querySelectorAll('#browseGroupBuysModal .card');
+                
+                groupBuyCards.forEach(function(card) {
+                    var itemName = card.querySelector('.card-title').textContent.toLowerCase();
+                    var category = card.querySelector('.badge.bg-success.rounded-pill');
+                    var categoryText = category ? category.textContent.trim().toLowerCase() : '';
+                    var organizer = '';
+                    var organizerElement = card.querySelector('.card-text.text-muted.small span');
+                    if (organizerElement) {
+                        organizer = organizerElement.textContent.toLowerCase();
+                    }
+                    
+                    if (itemName.includes(searchTerm) || categoryText.includes(searchTerm) || organizer.includes(searchTerm)) {
+                        card.closest('.col-md-6').style.display = '';
+                    } else {
+                        card.closest('.col-md-6').style.display = 'none';
+                    }
+                });
+                
+                // Show a message if no results are found
+                var visibleCards = document.querySelectorAll('#browseGroupBuysModal .card:not([style*="display: none"])');
+                var noResultsMessage = document.getElementById('noSearchResults');
+                var rowElement = document.querySelector('#browseGroupBuysModal .row');
+                
+                if (visibleCards.length === 0 && searchTerm !== '') {
+                    if (!noResultsMessage) {
+                        var resultDiv = document.createElement('div');
+                        resultDiv.id = 'noSearchResults';
+                        resultDiv.className = 'text-center py-4 col-12';
+                        resultDiv.innerHTML = '<i class="fas fa-search text-muted fa-2x mb-3"></i><p class="lead">No matching group buys found</p>';
+                        if (rowElement) {
+                            rowElement.appendChild(resultDiv);
+                        }
+                    } else {
+                        noResultsMessage.style.display = '';
+                    }
+                } else if (noResultsMessage) {
+                    noResultsMessage.style.display = 'none';
+                }
+            }
+            
+            if (groupBuySearch) {
+                // Search as you type
+                groupBuySearch.addEventListener('input', filterGroupBuys);
+                
+                // Search on button click
+                if (searchButton) {
+                    searchButton.addEventListener('click', filterGroupBuys);
+                }
+                
+                // Search on Enter key press
+                groupBuySearch.addEventListener('keyup', function(event) {
+                    if (event.key === 'Enter') {
+                        filterGroupBuys();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

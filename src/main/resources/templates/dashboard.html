@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeedItNow - Community Dashboard</title>
+    <!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        body {
+            background: #000;
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Background effects */
+        .bg-gradient {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(168, 85, 247, 0.4), rgba(147, 51, 234, 0.5), #000);
+            z-index: -1;
+        }
+
+        .noise-overlay {
+            position: fixed;
+            inset: 0;
+            opacity: 0.03;
+            mix-blend-mode: soft-light;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            background-size: 200px 200px;
+            z-index: -1;
+        }
+
+        .glow-top {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120vh;
+            height: 60vh;
+            border-radius: 0 0 50% 50%;
+            background: rgba(192, 132, 252, 0.2);
+            filter: blur(80px);
+            z-index: -1;
+        }
+
+        .glow-middle {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100vh;
+            height: 60vh;
+            border-radius: 0 0 100% 100%;
+            background: rgba(216, 180, 254, 0.2);
+            filter: blur(60px);
+            animation: pulse-middle 8s ease-in-out infinite alternate;
+            z-index: -1;
+        }
+
+        .glow-bottom {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90vh;
+            height: 90vh;
+            border-radius: 100% 100% 0 0;
+            background: rgba(192, 132, 252, 0.2);
+            filter: blur(60px);
+            animation: pulse-bottom 6s ease-in-out 1s infinite alternate;
+            z-index: -1;
+        }
+
+        .glow-spot-1, .glow-spot-2 {
+            position: fixed;
+            width: 24rem;
+            height: 24rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.4;
+            animation: pulse-spot 3s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        .glow-spot-1 {
+            left: 25%;
+            top: 25%;
+        }
+
+        .glow-spot-2 {
+            right: 25%;
+            bottom: 25%;
+            animation-delay: 1s;
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 10;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(to bottom, #fff, rgba(255, 255, 255, 0.8));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .logo svg {
+            margin-right: 10px;
+        }
+        
+        .welcome-message {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        /* Dashboard container */
+        .dashboard-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .dashboard-title {
+            font-size: 32px;
+            font-weight: bold;
+            background: linear-gradient(to bottom, #fff, rgba(255, 255, 255, 0.8));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 40px;
+            animation: slide-up 0.8s ease forwards;
+        }
+        
+        /* Community options */
+        .community-options {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .community-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 30px;
+            width: 300px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            animation: slide-up 0.8s ease forwards;
+        }
+
+        .community-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .community-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .community-card:hover::before {
+            opacity: 1;
+        }
+        
+        .card-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+        }
+        
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+        
+        .card-description {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 20px;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 200px;
+            position: relative;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0));
+            transform: translateX(-100%);
+            animation: button-shine 2s ease-in-out infinite;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.8), rgba(147, 51, 234, 0.8));
+            color: #fff;
+            border: 1px solid rgba(168, 85, 247, 0.5);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.9), rgba(147, 51, 234, 0.9));
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.8), rgba(147, 51, 234, 0.8));
+            color: #fff;
+            border: 1px solid rgba(168, 85, 247, 0.5);
+            margin-top: 40px;
+        }
+        
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.9), rgba(147, 51, 234, 0.9));
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-logout {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 0.5rem 1.25rem;
+            font-size: 0.875rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-logout::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+        
+        .btn-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-logout:hover::before {
+            transform: translateX(100%);
+        }
+
+        /* Add this if you want to match the exact icon style */
+        .btn-logout i {
+            font-size: 0.9em;
+        }
+
+        /* Animations */
+        @keyframes slide-up {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse-middle {
+            0%, 100% { opacity: 0.15; transform: translateX(-50%) scale(0.98); }
+            50% { opacity: 0.3; transform: translateX(-50%) scale(1.02); }
+        }
+
+        @keyframes pulse-bottom {
+            0%, 100% { opacity: 0.3; transform: translateX(-50%) scale(1); }
+            50% { opacity: 0.5; transform: translateX(-50%) scale(1.1); }
+        }
+
+        @keyframes pulse-spot {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.6; }
+        }
+
+        @keyframes button-shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .welcome-message {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .community-options {
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+
+            .community-card {
+                width: 100%;
+                max-width: 350px;
+            }
+
+            .dashboard-title {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background effects -->
+    <div class="bg-gradient"></div>
+    <div class="noise-overlay"></div>
+    <div class="glow-top"></div>
+    <div class="glow-middle"></div>
+    <div class="glow-bottom"></div>
+    <div class="glow-spot-1"></div>
+    <div class="glow-spot-2"></div>
+
+    <div class="header">
+        <div class="logo">
+            <svg width="30" height="30" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" fill="url(#logo-gradient)" />
+                <text x="50%" y="50%" text-anchor="middle" fill="white" font-family="Arial" font-size="30" font-weight="bold" dy=".3em">NIN</text>
+                <defs>
+                    <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:rgba(168, 85, 247, 0.8);stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:rgba(147, 51, 234, 0.8);stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+            </svg>
+            <span>NeedItNow</span>
+        </div>
+        <div class="welcome-message">
+            Welcome, <span th:text="${user.fullName}"></span>!
+            <a th:href="@{/user/logout}" class="btn-logout btn">
+                <i class="fas fa-sign-out-alt"></i>Logout</a>
+        </div>
+    </div>
+    
+    <div class="dashboard-container">
+        <h1 class="dashboard-title">Community Dashboard</h1>
+        
+        <div class="community-options">
+            <div class="community-card">
+                <div class="card-icon">👥</div>
+                <h3 class="card-title">Join New Community</h3>
+                <p class="card-description">Discover and join communities in your area to connect with neighbors and share resources.</p>
+                <a th:href="@{/user/join-community}" class="btn btn-primary">Join Now</a>
+            </div>
+            
+            <div class="community-card">
+                <div class="card-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="43" height="43" fill="none" stroke="#5B3E81" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M3 9.5L12 3l9 6.5v11a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-11z"/>
+                      </svg>
+                </div>
+                <h3 class="card-title">My Communities</h3>
+                <p class="card-description">View and manage all the communities you're currently a member of.</p>
+                <a th:href="@{/user/community/my-communities}" class="btn btn-secondary">View All</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

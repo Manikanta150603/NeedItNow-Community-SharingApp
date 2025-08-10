@@ -1,0 +1,1091 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Asking List - NeedItNow</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+   /* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+    background: #000;
+    min-height: 100vh;
+    position: relative;
+    color: #fff;
+    overflow-x: hidden;
+}
+
+/* Background effects */
+.bg-gradient {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(168, 85, 247, 0.4), rgba(147, 51, 234, 0.5), #000);
+    z-index: -3;
+}
+
+.noise-overlay {
+    position: fixed;
+    inset: 0;
+    opacity: 0.03;
+    mix-blend-mode: soft-light;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    z-index: -2;
+}
+
+.glow-top {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120vh;
+    height: 60vh;
+    border-radius: 0 0 50% 50%;
+    background: rgba(192, 132, 252, 0.2);
+    filter: blur(80px);
+    z-index: -1;
+}
+
+.glow-middle {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100vh;
+    height: 60vh;
+    border-radius: 0 0 100% 100%;
+    background: rgba(216, 180, 254, 0.2);
+    filter: blur(60px);
+    animation: pulse-middle 8s ease-in-out infinite alternate;
+    z-index: -1;
+}
+
+.glow-bottom {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90vh;
+    height: 90vh;
+    border-radius: 100% 100% 0 0;
+    background: rgba(192, 132, 252, 0.2);
+    filter: blur(60px);
+    animation: pulse-bottom 6s ease-in-out 1s infinite alternate;
+    z-index: -1;
+}
+
+/* Add background elements to body */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(168, 85, 247, 0.4), rgba(147, 51, 234, 0.5), #000);
+    z-index: -3;
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    opacity: 0.03;
+    mix-blend-mode: soft-light;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    z-index: -2;
+}
+
+/* Dashboard Header */
+.dashboard-header {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 2rem 0;
+    position: relative;
+    z-index: 10;
+}
+
+.dashboard-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.dashboard-header .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    position: relative;
+    z-index: 1;
+}
+
+.dashboard-header h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    background: linear-gradient(to bottom, #fff, rgba(255, 255, 255, 0.8));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 0.5rem;
+    animation: slide-up 0.8s ease forwards;
+}
+
+.dashboard-header p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1rem;
+    animation: slide-up 0.8s ease 0.2s forwards;
+    opacity: 0;
+}
+
+/* Back Button */
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.5rem;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    margin-bottom: 1.5rem;
+    animation: slide-up 0.8s ease 0.1s forwards;
+    opacity: 0;
+}
+
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    color: #fff;
+}
+
+.back-btn:active {
+    transform: translateY(0);
+}
+
+/* Container */
+.container {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+/* Item Cards */
+.item-card {
+    background: rgba(45, 35, 75, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(147, 51, 234, 0.3);
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
+    animation: slide-up 0.8s ease forwards;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+}
+
+.item-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(147, 51, 234, 0.1) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.item-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(147, 51, 234, 0.5);
+    box-shadow: 0 15px 30px rgba(147, 51, 234, 0.2);
+}
+
+.item-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    position: relative;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.item-body {
+    padding: 1.25rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+
+
+.item-title {
+    color: #fff;
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    flex: 1;
+    min-height: 2.5rem;
+    display: flex;
+    align-items: flex-start;
+}
+
+/* Status badges */
+.item-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-left: 0.5rem;
+}
+
+.status-accepted {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.status-rejected {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.status-pending {
+    background: rgba(249, 115, 22, 0.2);
+    color: #f97316;
+    border: 1px solid rgba(249, 115, 22, 0.3);
+}
+
+.item-meta {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.item-meta i {
+    color: rgba(147, 51, 234, 0.8);
+    width: 16px;
+}
+
+.requested-by {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+}
+
+.item-description {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    margin: 1rem 0;
+    line-height: 1.4;
+    background: rgba(147, 51, 234, 0.1);
+    border: 1px solid rgba(147, 51, 234, 0.2);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.item-description i {
+    color: rgba(147, 51, 234, 0.8);
+    margin-top: 0.1rem;
+    font-size: 0.9rem;
+}
+
+.item-quantity {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+    margin: 1rem 0;
+}
+
+.item-price {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 1.5rem;
+}
+
+/* Status badges */
+.item-status {
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    backdrop-filter: blur(5px);
+}
+
+.status-accepted {
+    background: rgba(34, 197, 94, 0.9);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+.status-rejected {
+    background: rgba(239, 68, 68, 0.9);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.status-pending {
+    background: rgba(251, 191, 36, 0.9);
+    color: #000;
+    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+}
+
+/* Buttons */
+.item-action-buttons {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.btn-accept {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    flex: 1;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-accept:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+    background: linear-gradient(135deg, #059669, #047857);
+}
+
+.btn-chat {
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    flex: 1;
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+}
+
+.btn-chat:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);
+    background: linear-gradient(135deg, #6d28d9, #5b21b6);
+}
+
+.btn-action, .btn-primary {
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+}
+
+.btn-action:hover, .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);
+    background: linear-gradient(135deg, #6d28d9, #5b21b6);
+}
+
+.btn-action::after, .btn-primary::after, .btn-accept::after, .btn-chat::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0));
+    transform: translateX(-100%);
+    animation: button-shine 2s ease-in-out infinite;
+}
+
+.chat-quick-btn {
+    background: rgba(124, 58, 237, 0.2);
+    color: #a855f7;
+    border: 1px solid rgba(124, 58, 237, 0.4);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+}
+
+.chat-quick-btn:hover {
+    background: rgba(124, 58, 237, 0.3);
+    color: #c084fc;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+}
+
+
+.default-img {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(147, 51, 234, 0.2) 0%, rgba(124, 58, 237, 0.3) 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.default-img i {
+    font-size: 3rem;
+    color: rgba(147, 51, 234, 0.6);
+    opacity: 0.8;
+}
+
+/* Message preview */
+.request-message {
+    background: rgba(147, 51, 234, 0.1);
+    border: 1px solid rgba(147, 51, 234, 0.2);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    margin: 1rem 0;
+}
+
+.message-preview {
+    flex: 1;
+    overflow: hidden;
+}
+
+.message-preview span {
+    color: rgba(255, 255, 255, 0.8);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    margin: 2rem 0;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: rgba(255, 255, 255, 0.3);
+    margin-bottom: 1rem;
+}
+
+.empty-state h4 {
+    color: #fff;
+    margin-bottom: 1rem;
+    background: linear-gradient(to bottom, #fff, rgba(255, 255, 255, 0.8));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.empty-state p {
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 1.5rem;
+}
+
+/* Chat Popup */
+.chat-popup {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 350px;
+    height: 500px;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    display: flex;
+    flex-direction: column;
+    transform: translateY(100%) scale(0.8);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+.chat-popup.show {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+.chat-popup::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+    border-radius: 1rem;
+    pointer-events: none;
+}
+
+.chat-header {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    background: rgba(147, 51, 234, 0.1);
+    border-radius: 1rem 1rem 0 0;
+}
+
+.chat-header h4 {
+    margin: 0;
+    color: #fff;
+    font-size: 1rem;
+    flex: 1;
+    background: linear-gradient(to bottom, #fff, rgba(255, 255, 255, 0.9));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.chat-close {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    padding: 0.25rem;
+    transition: color 0.3s ease;
+    font-size: 1.2rem;
+}
+
+.chat-close:hover {
+    color: #fff;
+}
+
+.chat-body {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.chat-body::-webkit-scrollbar {
+    width: 4px;
+}
+
+.chat-body::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+}
+
+.chat-body::-webkit-scrollbar-thumb {
+    background: rgba(147, 51, 234, 0.5);
+    border-radius: 2px;
+}
+
+.chat-message {
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    max-width: 80%;
+    word-wrap: break-word;
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+.chat-message.sent {
+    background: rgba(147, 51, 234, 0.3);
+    color: #fff;
+    align-self: flex-end;
+    border: 1px solid rgba(147, 51, 234, 0.4);
+}
+
+.chat-message.received {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.9);
+    align-self: flex-start;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.chat-footer {
+    padding: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.chat-input {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    color: #fff;
+    font-size: 0.875rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.chat-input:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(147, 51, 234, 0.5);
+}
+
+.chat-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.chat-send {
+    background: rgba(147, 51, 234, 0.8);
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chat-send:hover {
+    background: rgba(147, 51, 234, 1);
+    transform: scale(1.05);
+}
+
+/* Animations */
+@keyframes slide-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-middle {
+    0%, 100% { opacity: 0.15; transform: translateX(-50%) scale(0.98); }
+    50% { opacity: 0.3; transform: translateX(-50%) scale(1.02); }
+}
+
+@keyframes pulse-bottom {
+    0%, 100% { opacity: 0.3; transform: translateX(-50%) scale(1); }
+    50% { opacity: 0.5; transform: translateX(-50%) scale(1.1); }
+}
+
+@keyframes button-shine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Utility classes */
+.text-white { color: #fff !important; }
+.text-white-50 { color: rgba(255, 255, 255, 0.5) !important; }
+.text-decoration-none { text-decoration: none !important; }
+.text-primary { color: #9333ea !important; }
+
+.d-flex { display: flex !important; }
+.justify-content-between { justify-content: space-between !important; }
+.align-items-center { align-items: center !important; }
+.w-100 { width: 100% !important; }
+
+.mb-0 { margin-bottom: 0 !important; }
+.mb-2 { margin-bottom: 0.5rem !important; }
+.mb-5 { margin-bottom: 3rem !important; }
+.mt-2 { margin-top: 0.5rem !important; }
+.mt-3 { margin-top: 1rem !important; }
+.me-1 { margin-right: 0.25rem !important; }
+.me-2 { margin-right: 0.5rem !important; }
+
+.h3 { font-size: 1.75rem !important; }
+
+/* Grid system */
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -0.5rem;
+}
+
+.col, .col-12 {
+    flex: 1;
+    padding: 0 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.row-cols-1 > .col,
+.row-cols-md-3 > .col {
+    flex: 0 0 100%;
+    max-width: 100%;
+}
+
+.g-4 {
+    margin: 0 -1rem;
+}
+
+.g-4 > .col {
+    padding: 0 1rem;
+    margin-bottom: 2rem;
+}
+
+/* Responsive */
+@media (min-width: 768px) {
+    .row-cols-md-3 > .col {
+        flex: 0 0 33.333333%;
+        max-width: 33.333333%;
+    }
+    
+    .chat-popup {
+        width: 400px;
+        height: 550px;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-header {
+        padding: 1.5rem 0;
+    }
+    
+    .container {
+        padding: 0 0.5rem;
+    }
+    
+    .item-body {
+        padding: 1rem;
+    }
+    
+    .chat-popup {
+        width: 320px;
+        height: 450px;
+        right: 10px;
+        bottom: 10px;
+    }
+    
+    .empty-state {
+        padding: 2rem 1rem;
+    }
+}
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="dashboard-header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <a th:href="@{/user/community/} + ${communityId} + '/share-circle'" class="text-white text-decoration-none">
+                        <i class="fas fa-arrow-left me-2"></i> Back to ShareCircle
+                    </a>
+                    <h1 class="h3 mb-0 mt-2">
+                        <i class="fas fa-list me-2"></i>My Asking List
+                    </h1>
+                    <p class="mb-0 text-white-50">Track items you've requested from your community</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mb-5">
+        <div class="row row-cols-1 row-cols-md-3 g-4" id="askingListContainer">
+            <div th:if="${items} and ${items.size() > 0}" th:each="item : ${items}" class="col">
+                <div class="item-card h-100">
+                    <img th:if="${encodedImages != null && encodedImages.get(item.id) != null}" th:src="@{'data:image/jpeg;base64,' + ${encodedImages.get(item.id)}}" class="item-img" alt="Item Image">
+<div th:unless="${encodedImages != null && encodedImages.get(item.id) != null}" class="item-img default-img">
+    <i class="fas fa-shopping-basket"></i>
+</div>                    
+                    <div class="item-body">
+                        <div class="d-flex justify-content-between">
+                            <h5 class="item-title" th:text="${item.itemName}">Item Name</h5>
+                            <span th:if="${item.requestAccepted == true}" class="item-status status-accepted">Accepted</span>
+                            <span th:if="${item.requestAccepted == false && item.requestRejected == true}" class="item-status status-rejected">Rejected</span>
+                            <span th:if="${item.requestAccepted == false && item.requestRejected == false}" class="item-status status-pending">Pending</span>
+                        </div>
+                        <div class="item-meta">
+                            <span th:text="'Category: ' + ${item.category}">Category</span>
+                        </div>
+                        <div class="item-meta">
+                            <span th:text="'Quantity: ' + ${item.availableQuantity}">Quantity</span>
+                        </div>
+                        <div class="item-meta">
+                            <span th:if="${itemOwners != null && itemOwners.get(item.id) != null}" th:text="'Owner: ' + ${itemOwners.get(item.id).fullName != null ? itemOwners.get(item.id).fullName : 'Unknown'}">Owner</span>
+                        </div>
+                        <div th:if="${latestMessages != null && latestMessages.get(item.id) != null}" class="item-meta request-message">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="message-preview">
+                                    <i class="fas fa-comment-dots me-1 text-primary"></i>
+                                    <span th:text="${latestMessages.get(item.id).message}">Message preview</span>
+                                </div>
+                                <button class="chat-quick-btn chat-btn" th:if="${itemOwners != null && itemOwners.get(item.id) != null}" 
+                                    th:data-item-name="${item.itemName}" 
+                                    th:data-owner-name="${itemOwners.get(item.id).fullName != null ? itemOwners.get(item.id).fullName : 'Unknown'}" 
+                                    th:data-item-id="${item.id}" 
+                                    th:data-owner-id="${itemOwners.get(item.id).id}">
+                                    <i class="fas fa-reply"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="item-description" th:text="${item.additionalNotes != null ? item.additionalNotes : ''}">Description</div>
+                        <div class="item-actions">
+                            <div class="item-meta" style="margin-bottom: 0;">
+                                <span th:if="${item.isFree}">Free</span>
+                                <span th:unless="${item.isFree}" th:text="'Price: ₹' + ${item.price != null ? item.price : '0.00'}">Price</span>
+                            </div>
+                        </div>
+                        <div class="item-action-buttons mt-2" th:data-item-id="${item.id}">
+                            <button class="btn-action btn-primary w-100 chat-btn" th:if="${itemOwners != null && itemOwners.get(item.id) != null}"
+                                th:data-item-name="${item.itemName}" 
+                                th:data-owner-name="${itemOwners.get(item.id).fullName != null ? itemOwners.get(item.id).fullName : 'Unknown'}" 
+                                th:data-item-id="${item.id}" 
+                                th:data-owner-id="${itemOwners.get(item.id).id}">
+                                <i class="fas fa-comment-alt"></i> Chat with Owner
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div th:unless="${items} and ${items.size() > 0}" class="empty-state col-12">
+                <i class="fas fa-inbox"></i>
+                <h4>No requests made</h4>
+                <p>You haven't requested any items yet. Browse available items to get started!</p>
+                <a th:href="@{/user/community/{communityId}/items/available(communityId=${communityId})}" class="btn btn-primary mt-3">
+                    <i class="fas fa-search me-2"></i>Browse Available Items
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Popup Container -->
+    <div id="chatPopup" class="chat-popup">
+        <div class="chat-header">
+            <h4 id="chatTitle">Chat</h4>
+            <button class="chat-close" id="chatCloseBtn"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="chatBody" class="chat-body">
+            <!-- Messages will be appended here -->
+        </div>
+        <div class="chat-footer">
+            <input type="text" id="chatInput" class="chat-input" placeholder="Type a message...">
+            <button class="chat-send" id="chatSendBtn"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUserId = /*[[${currentUserId}]]*/ 0;
+            const communityId = /*[[${communityId}]]*/ 0;
+            
+            console.log('DOM loaded with currentUserId:', currentUserId, 'communityId:', communityId);
+            
+            // Chat Popup Functions
+            let currentChatOwnerId = null;
+            let currentItemId = null;
+            
+            // Log the chat popup element for debugging
+            console.log('Chat popup element:', document.getElementById('chatPopup'));
+            
+            // Add event listeners to all chat buttons
+            document.querySelectorAll('.chat-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const itemName = this.getAttribute('data-item-name');
+                    const ownerName = this.getAttribute('data-owner-name');
+                    const itemId = this.getAttribute('data-item-id');
+                    const ownerId = this.getAttribute('data-owner-id');
+                    openChatPopup(itemName, ownerName, itemId, ownerId);
+                });
+            });
+            
+            // Add event listener for the chat close button
+            document.getElementById('chatCloseBtn').addEventListener('click', function() {
+                closeChatPopup();
+            });
+            
+            // Add event listener for the chat send button
+            document.getElementById('chatSendBtn').addEventListener('click', function() {
+                sendMessage();
+            });
+            
+            // Add event listener for Enter key in the chat input field
+            document.getElementById('chatInput').addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+
+            window.openChatPopup = function(itemName, ownerName, itemId, ownerId) {
+                console.log('Opening chat popup with:', { itemName, ownerName, itemId, ownerId });
+                
+                const chatPopup = document.getElementById('chatPopup');
+                const chatTitle = document.getElementById('chatTitle');
+                const chatBody = document.getElementById('chatBody');
+                
+                if (!chatPopup || !chatTitle || !chatBody) {
+                    console.error('Chat popup elements not found!', { chatPopup, chatTitle, chatBody });
+                    alert('Error: Chat interface elements not found');
+                    return;
+                }
+
+                if (currentChatOwnerId && (currentChatOwnerId !== ownerId || currentItemId !== itemId)) {
+                    closeChatPopup();
+                }
+
+                chatTitle.textContent = `Chat with ${ownerName} about ${itemName}`;
+                currentChatOwnerId = ownerId;
+                currentItemId = itemId;
+
+                // Log parameters for debugging
+                console.log(`Fetching chat history: itemId=${itemId}, senderId=${currentUserId}, receiverId=${ownerId}`);
+
+                // Load chat history
+                fetch(`/user/community/${communityId}/items/chat/history?itemId=${itemId}&senderId=${currentUserId}&receiverId=${ownerId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(messages => {
+                    console.log('Chat history received:', messages);
+                    chatBody.innerHTML = '';
+                    if (messages.length === 0) {
+                        chatBody.innerHTML = '<div class="chat-message received">No previous messages.</div>';
+                    } else {
+                        messages.forEach(msg => {
+                            const isSent = msg.sender.id === currentUserId;
+                            const messageHtml = `
+                                <div class="chat-message ${isSent ? 'sent' : 'received'}">
+                                    ${msg.message}
+                                </div>
+                            `;
+                            chatBody.insertAdjacentHTML('beforeend', messageHtml);
+                        });
+                    }
+                    chatBody.scrollTop = chatBody.scrollHeight;
+                    
+                    // Show the chat popup after content is loaded
+                    chatPopup.classList.add('show');
+                    console.log('Chat popup should be visible now');
+                })
+                .catch(error => {
+                    console.error('Error loading chat history:', error);
+                    chatBody.innerHTML = `<div class="chat-message received">Error loading chat history: ${error.message}</div>`;
+                    
+                    // Show the chat popup even if there's an error
+                    chatPopup.classList.add('show');
+                });
+            };
+
+            window.closeChatPopup = function() {
+                console.log('Closing chat popup');
+                const chatPopup = document.getElementById('chatPopup');
+                const chatBody = document.getElementById('chatBody');
+                
+                if (!chatPopup || !chatBody) {
+                    console.error('Chat popup elements not found during close!', { chatPopup, chatBody });
+                    return;
+                }
+                
+                chatPopup.classList.remove('show');
+                chatBody.innerHTML = '';
+                currentChatOwnerId = null;
+                currentItemId = null;
+            };
+
+            window.sendMessage = function() {
+                const chatInput = document.getElementById('chatInput');
+                const chatBody = document.getElementById('chatBody');
+                const messageText = chatInput.value.trim();
+
+                if (messageText && currentItemId && currentChatOwnerId) {
+                    const messageHtml = `
+                        <div class="chat-message sent">
+                            ${messageText}
+                        </div>
+                    `;
+                    chatBody.insertAdjacentHTML('beforeend', messageHtml);
+                    chatInput.value = '';
+
+                    chatBody.scrollTop = chatBody.scrollHeight;
+
+                    // Log parameters for debugging
+                    console.log(`Sending message: itemId=${currentItemId}, senderId=${currentUserId}, receiverId=${currentChatOwnerId}, message=${messageText}`);
+
+                    // Send message to backend
+                    fetch(`/user/community/${communityId}/items/chat/send`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `itemId=${currentItemId}&senderId=${currentUserId}&receiverId=${currentChatOwnerId}&message=${encodeURIComponent(messageText)}`
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.text();
+                    })
+                    .then(result => {
+                        console.log('Message sent successfully:', result);
+                    })
+                    .catch(error => {
+                        console.error('Error sending message:', error);
+                        chatBody.insertAdjacentHTML('beforeend', `<div class="chat-message received">Error sending message: ${error.message}</div>`);
+                    });
+                } else {
+                    console.warn('Cannot send message: Missing itemId or ownerId');
+                }
+            };
+        });
+    </script>
+</body>
+</html>
